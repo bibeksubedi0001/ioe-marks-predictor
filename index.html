@@ -8,84 +8,131 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            background-color: #f5f3f0;
-            background-image:
-                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background: #f7f6f3;
             min-height: 100vh;
-            padding: 30px 15px 40px;
+            padding: 0;
         }
 
-        /* ---- Page Header ---- */
-        .page-header {
-            max-width: 1050px; margin: 0 auto 22px;
-            text-align: center;
+        /* ---- Top Nav Bar ---- */
+        .top-nav {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
         }
-        .page-header h1 {
-            font-size: 1.5rem; font-weight: 700; color: #1a1a1a;
-            letter-spacing: 0.5px;
+        .top-nav .brand {
+            display: flex; align-items: center; gap: 10px;
         }
-        .page-header p {
-            font-size: 0.88rem; color: #666; margin-top: 4px;
+        .top-nav .brand-icon {
+            width: 28px; height: 28px; background: #2563eb;
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: #fff; font-size: 0.8rem;
+        }
+        .top-nav h1 {
+            font-size: 1.05rem; font-weight: 700; color: #f1f5f9;
+            letter-spacing: 0.3px;
+        }
+        .top-nav .nav-link {
+            color: #94a3b8; font-size: 0.78rem; text-decoration: none;
+            transition: color 0.2s;
+        }
+        .top-nav .nav-link:hover { color: #e2e8f0; }
+
+        .page-wrap {
+            max-width: 1080px; margin: 0 auto;
+            padding: 26px 18px 40px;
+        }
+
+        /* ---- Mode Banner ---- */
+        .mode-banner {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            background: #eff6ff; border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            font-size: 0.84rem; color: #1e40af;
+        }
+        .mode-banner.reverse {
+            background: #fef3c7; border-color: #fde68a;
+            color: #92400e;
+        }
+        .mode-banner .mode-icon {
+            font-size: 1.1rem; flex-shrink: 0;
         }
 
         /* ---- Control Panel ---- */
         .control-panel {
-            max-width: 1050px; margin: 0 auto 22px;
-            background: #fff; border: 1px solid #d4d0cb;
-            border-radius: 12px; padding: 20px 26px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            background: #fff;
+            border: 1px solid #e2e0dc;
+            border-radius: 14px; padding: 22px 28px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            margin-bottom: 24px;
         }
-        .control-row {
-            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-            margin-bottom: 14px;
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 16px 24px;
+            align-items: end;
         }
-        .control-row:last-child { margin-bottom: 0; }
-        .control-row label {
-            font-size: 0.9rem; color: #222; font-weight: 700;
-            min-width: fit-content;
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
+        .control-group label {
+            font-size: 0.78rem; color: #64748b; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
         }
-        .control-row select {
-            padding: 9px 14px; border-radius: 8px; border: 1px solid #bbb;
-            font-size: 0.88rem; background: #faf9f7; cursor: pointer;
+        .control-group select {
+            padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db;
+            font-size: 0.9rem; background: #fafaf9; cursor: pointer;
             font-family: 'Times New Roman', Times, serif;
             transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
         }
-        .control-row select:focus {
+        .control-group select:focus {
             border-color: #2563eb; outline: none;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+        }
+        .control-group input[type="text"] {
+            padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db;
+            font-size: 0.9rem; background: #fafaf9;
+            font-family: 'Times New Roman', Times, serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        .control-group input[type="text"]:focus {
+            border-color: #2563eb; outline: none;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
         }
         .mode-toggle {
             display: inline-flex;
-            border: 2px solid #2563eb; border-radius: 8px; overflow: hidden;
+            border-radius: 10px; overflow: hidden;
+            background: #f1f5f9; padding: 3px;
+            gap: 3px;
         }
         .mode-toggle button {
-            padding: 9px 22px; border: none; background: #fff;
-            font-size: 0.88rem; font-weight: 700; cursor: pointer;
-            color: #2563eb; font-family: 'Times New Roman', Times, serif;
-            transition: background 0.2s, color 0.2s;
+            padding: 9px 20px; border: none;
+            background: transparent;
+            font-size: 0.84rem; font-weight: 700; cursor: pointer;
+            color: #64748b; font-family: 'Times New Roman', Times, serif;
+            border-radius: 8px;
+            transition: all 0.25s ease;
         }
-        .mode-toggle button.active { background: #2563eb; color: #fff; }
-        .mode-toggle button:hover:not(.active) { background: #eef3ff; }
-        .control-row input[type="text"] {
-            padding: 9px 14px; border-radius: 8px; border: 1px solid #bbb;
-            font-size: 0.92rem; width: 340px;
-            font-family: 'Times New Roman', Times, serif;
-            transition: border-color 0.2s, box-shadow 0.2s;
+        .mode-toggle button.active {
+            background: #2563eb; color: #fff;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.3);
         }
-        .control-row input[type="text"]:focus {
-            border-color: #2563eb; outline: none;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        .mode-toggle button:hover:not(.active) { color: #1e293b; background: #e2e8f0; }
+        .control-name-row {
+            display: flex; gap: 24px; align-items: end;
+            margin-top: 16px; padding-top: 16px;
+            border-top: 1px solid #f1f0ed;
         }
-        .control-divider {
-            height: 1px; background: #eae7e2; margin: 4px 0;
-        }
+        .control-name-row .control-group { flex: 1; }
+        .control-name-row .control-group:last-child { flex: 0 0 auto; }
 
         /* ---- Marksheet ---- */
         .marksheet {
-            max-width: 1050px; margin: 0 auto; background: #fff;
-            border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background: #fff;
+            border: 1px solid #333; box-shadow: 0 2px 16px rgba(0,0,0,0.07);
         }
         .ms-header {
             text-align: center; padding: 18px 20px 10px;
@@ -162,40 +209,37 @@
 
         /* Buttons */
         .btn-row {
-            max-width: 1050px; margin: 22px auto 0;
             display: flex; gap: 14px; flex-wrap: wrap;
             justify-content: center;
+            margin-top: 24px;
         }
         .btn {
             padding: 12px 34px; border: none; border-radius: 10px;
             font-size: 0.92rem; font-weight: 700; cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition: all 0.2s ease;
             font-family: 'Times New Roman', Times, serif;
             display: inline-flex; align-items: center; gap: 8px;
         }
         .btn:hover { transform: translateY(-2px); }
         .btn:active { transform: translateY(0); }
-        .btn-reset { background: #e5e7eb; color: #374151; }
-        .btn-reset:hover { background: #d1d5db; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
-        .btn-print { background: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.25); }
-        .btn-print:hover { background: #14532d; box-shadow: 0 6px 18px rgba(22,101,52,0.35); }
+        .btn-reset { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .btn-reset:hover { background: #e2e8f0; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+        .btn-print { background: linear-gradient(135deg, #166534, #15803d); color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.25); }
+        .btn-print:hover { box-shadow: 0 6px 20px rgba(22,101,52,0.35); }
 
         /* ---- Page Footer ---- */
         .page-footer {
-            max-width: 1050px; margin: 24px auto 0;
-            text-align: center; font-size: 0.78rem; color: #999;
+            text-align: center; font-size: 0.78rem; color: #94a3b8;
+            margin-top: 28px; padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
         }
-        .page-footer a { color: #888; text-decoration: none; }
+        .page-footer a { color: #64748b; text-decoration: none; }
         .page-footer a:hover { color: #2563eb; text-decoration: underline; }
 
         /* ---- Loader overlay ---- */
         #loader {
             position: fixed; inset: 0;
-            background-color: #f5f3f0;
-            background-image:
-                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background: #f7f6f3;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             z-index: 9999;
@@ -223,7 +267,8 @@
         /* Print */
         @media print {
             body { background: #fff; padding: 0; }
-            .control-panel, .btn-row, .page-header, .page-footer { display: none !important; }
+            .control-panel, .btn-row, .page-header, .page-footer, .top-nav, .mode-banner { display: none !important; }
+            .page-wrap { padding: 0; max-width: 100%; }
             .marksheet { border: 1px solid #555; box-shadow: none; max-width: 100%; }
             .input-cell input {
                 border: none !important; background: transparent !important;
@@ -242,9 +287,12 @@
         .watermark { display: none; }
 
         @media (max-width: 700px) {
-            body { padding: 10px 4px; }
+            .page-wrap { padding: 14px 8px 30px; }
+            .control-grid { grid-template-columns: 1fr; }
+            .control-name-row { flex-direction: column; }
             .ms-header { padding: 10px 8px 6px; }
             .ms-info { padding: 6px 10px; font-size: 0.78rem; }
+            .top-nav h1 { font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -255,32 +303,47 @@
         <p id="loaderText">Loading subject data&hellip;</p>
     </div>
 
-    <!-- Page Header -->
-    <div class="page-header" id="pageHeader" style="display:none;">
-        <h1>IOE Internal Marks Predictor</h1>
-        <p>Predict your marksheet internals or reverse-track teacher marks</p>
+    <!-- Top Nav -->
+    <nav class="top-nav" id="topNav" style="display:none;">
+        <div class="brand">
+            <div class="brand-icon">IOE</div>
+            <h1>Internal Marks Predictor</h1>
+        </div>
+        <a class="nav-link" href="https://bibeksubedi0001.com.np" target="_blank">by Bibek Subedi</a>
+    </nav>
+
+    <div class="page-wrap">
+
+    <!-- Mode Banner -->
+    <div class="mode-banner" id="modeBanner" style="display:none;">
+        <span class="mode-icon" id="modeBannerIcon">&#9654;</span>
+        <span id="modeBannerText"><b>Predict Mode</b> &mdash; Enter teacher marks (Asst.) + external score (Final) to see your predicted marksheet.</span>
     </div>
 
     <!-- Control Panel -->
     <div class="control-panel" id="controlsBar" style="display:none;">
-        <div class="control-row">
-            <label>Faculty:</label>
-            <select id="facSelect" onchange="onFacultyChange()"></select>
-            <label>Semester:</label>
-            <select id="semSelect" onchange="loadSemester()"></select>
-        </div>
-        <div class="control-divider"></div>
-        <div class="control-row">
-            <label>Mode:</label>
-            <div class="mode-toggle">
-                <button id="modePredict" class="active" onclick="setMode('predict')">Predict &rarr; Marksheet</button>
-                <button id="modeReverse" onclick="setMode('reverse')">Reverse &larr; Track Teacher</button>
+        <div class="control-grid">
+            <div class="control-group">
+                <label>Faculty</label>
+                <select id="facSelect" onchange="onFacultyChange()"></select>
+            </div>
+            <div class="control-group">
+                <label>Semester</label>
+                <select id="semSelect" onchange="loadSemester()"></select>
+            </div>
+            <div class="control-group">
+                <label>Mode</label>
+                <div class="mode-toggle">
+                    <button id="modePredict" class="active" onclick="setMode('predict')">&#9654; Predict</button>
+                    <button id="modeReverse" onclick="setMode('reverse')">&#9664; Reverse</button>
+                </div>
             </div>
         </div>
-        <div class="control-divider"></div>
-        <div class="control-row">
-            <label>Student Name:</label>
-            <input type="text" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+        <div class="control-name-row">
+            <div class="control-group">
+                <label>Student Name</label>
+                <input type="text" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+            </div>
         </div>
     </div>
 
@@ -358,14 +421,15 @@
 
     <div class="btn-row" id="btnRow" style="display:none;">
         <button class="btn btn-reset" onclick="resetAll()">&#8634; Reset All</button>
-        <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
+        <button class="btn btn-print" onclick="window.print()">&#128424; Print Marksheet</button>
     </div>
 
     <!-- Page Footer -->
     <div class="page-footer" id="pageFooter" style="display:none;">
-        Built by <a href="https://bibeksubedi0001.com.np" target="_blank">Bibek Subedi</a>
-        &nbsp;&bull;&nbsp; GPA shown may vary &plusmn;0.03 from the actual marksheet
+        GPA shown may vary &plusmn;0.03 from the actual marksheet
     </div>
+
+    </div><!-- /page-wrap -->
 
     <script src="data/subject-data.js"></script>
     <script>
@@ -507,7 +571,7 @@
             var loader = document.getElementById('loader');
             loader.classList.add('fade-out');
             setTimeout(function() { loader.style.display = 'none'; }, 420);
-            ['pageHeader','controlsBar','marksheet','btnRow','pageFooter']
+            ['topNav','modeBanner','controlsBar','marksheet','btnRow','pageFooter']
                 .forEach(function(id) { document.getElementById(id).style.display = ''; });
         }
 
@@ -674,6 +738,18 @@
             mode = m;
             document.getElementById('modePredict').classList.toggle('active', m === 'predict');
             document.getElementById('modeReverse').classList.toggle('active', m === 'reverse');
+            var banner = document.getElementById('modeBanner');
+            var icon = document.getElementById('modeBannerIcon');
+            var text = document.getElementById('modeBannerText');
+            if (m === 'predict') {
+                banner.className = 'mode-banner';
+                icon.innerHTML = '&#9654;';
+                text.innerHTML = '<b>Predict Mode</b> &mdash; Enter teacher marks (Asst.) + external score (Final) to see your predicted marksheet.';
+            } else {
+                banner.className = 'mode-banner reverse';
+                icon.innerHTML = '&#9664;';
+                text.innerHTML = '<b>Reverse Mode</b> &mdash; Enter marksheet Asst. &amp; Final marks to find what your teacher originally gave.';
+            }
             buildTable();
         }
 
