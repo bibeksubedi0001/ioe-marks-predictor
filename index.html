@@ -9,17 +9,38 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            background: #e8e4df; 
+            background: #1a1a2e;
             min-height: 100vh;
-            padding: 30px 15px;
+            padding: 0;
+        }
+
+        /* ---- Page Header ---- */
+        .page-header {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            padding: 28px 20px 22px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .page-header h1 {
+            color: #fff; font-size: 1.6rem; font-weight: 700;
+            letter-spacing: 0.5px; margin-bottom: 4px;
+        }
+        .page-header p {
+            color: #a8b4c8; font-size: 0.88rem;
+        }
+
+        .page-body {
+            max-width: 1100px; margin: 0 auto;
+            padding: 24px 16px 40px;
         }
 
         /* ---- Control Panel ---- */
         .control-panel {
-            max-width: 1050px; margin: 0 auto 20px;
-            background: #fff; border: 1px solid #c8c4bf;
-            border-radius: 10px; padding: 18px 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin: 0 auto 22px;
+            background: linear-gradient(180deg, #f8f7f5 0%, #fff 100%);
+            border: 1px solid #d4d0ca;
+            border-radius: 12px; padding: 20px 26px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
         .control-row {
             display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
@@ -27,41 +48,43 @@
         }
         .control-row:last-child { margin-bottom: 0; }
         .control-row label {
-            font-size: 0.9rem; color: #333; font-weight: 700;
+            font-size: 0.92rem; color: #333; font-weight: 700;
             min-width: fit-content;
         }
         .control-row select {
-            padding: 8px 14px; border-radius: 6px; border: 1px solid #aaa;
-            font-size: 0.88rem; background: #faf9f7; cursor: pointer;
+            padding: 9px 16px; border-radius: 6px; border: 1px solid #b0aca6;
+            font-size: 0.9rem; background: #fff; cursor: pointer;
             font-family: 'Times New Roman', Times, serif;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        .control-row select:focus { border-color: #2563eb; outline: none; }
+        .control-row select:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
         .mode-toggle {
             display: inline-flex;
-            border: 2px solid #2563eb; border-radius: 8px; overflow: hidden;
+            border: 2px solid #e94560; border-radius: 8px; overflow: hidden;
         }
         .mode-toggle button {
-            padding: 8px 20px; border: none; background: #fff;
-            font-size: 0.88rem; font-weight: 700; cursor: pointer;
-            color: #2563eb; font-family: 'Times New Roman', Times, serif;
+            padding: 9px 22px; border: none; background: #fff;
+            font-size: 0.9rem; font-weight: 700; cursor: pointer;
+            color: #e94560; font-family: 'Times New Roman', Times, serif;
             transition: background 0.2s, color 0.2s;
         }
-        .mode-toggle button.active { background: #2563eb; color: #fff; }
-        .mode-toggle button:hover:not(.active) { background: #eef3ff; }
+        .mode-toggle button.active { background: #e94560; color: #fff; }
+        .mode-toggle button:hover:not(.active) { background: #fef2f4; }
         .control-row input[type="text"] {
-            padding: 8px 14px; border-radius: 6px; border: 1px solid #aaa;
-            font-size: 0.92rem; width: 340px;
+            padding: 9px 16px; border-radius: 6px; border: 1px solid #b0aca6;
+            font-size: 0.94rem; width: 360px;
             font-family: 'Times New Roman', Times, serif;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        .control-row input[type="text"]:focus { border-color: #2563eb; outline: none; }
+        .control-row input[type="text"]:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
         .control-divider {
-            height: 1px; background: #e5e2dd; margin: 2px 0;
+            height: 1px; background: linear-gradient(90deg, transparent, #d4d0ca, transparent); margin: 4px 0;
         }
 
         /* ---- Marksheet ---- */
         .marksheet {
-            max-width: 1050px; margin: 0 auto; background: #fff;
-            border: 2px solid #333; box-shadow: 3px 3px 12px rgba(0,0,0,0.15);
+            margin: 0 auto; background: #fff;
+            border: 2px solid #333; box-shadow: 0 6px 24px rgba(0,0,0,0.18);
         }
         .ms-header {
             text-align: center; padding: 18px 20px 10px;
@@ -138,30 +161,40 @@
 
         /* Buttons */
         .btn-row {
-            max-width: 1050px; margin: 18px auto 0;
-            display: flex; gap: 12px; flex-wrap: wrap;
+            margin: 22px auto 0;
+            display: flex; gap: 14px; flex-wrap: wrap;
             justify-content: center;
         }
         .btn {
-            padding: 11px 32px; border: none; border-radius: 8px;
-            font-size: 0.92rem; font-weight: 700; cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
+            padding: 12px 34px; border: none; border-radius: 8px;
+            font-size: 0.94rem; font-weight: 700; cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
             font-family: 'Times New Roman', Times, serif;
             display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn:hover { transform: translateY(-1px); }
+        .btn:hover { transform: translateY(-2px); }
         .btn:active { transform: translateY(0); }
         .btn-reset { background: #e5e7eb; color: #374151; }
-        .btn-reset:hover { background: #d1d5db; }
+        .btn-reset:hover { background: #d1d5db; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .btn-print { background: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.3); }
-        .btn-print:hover { background: #14532d; }
-        .btn-pdf { background: #1e40af; color: #fff; box-shadow: 0 4px 14px rgba(30,64,175,0.3); }
-        .btn-pdf:hover { background: #1e3a8a; }
+        .btn-print:hover { background: #14532d; box-shadow: 0 6px 20px rgba(22,101,52,0.4); }
+        .btn-pdf { background: #dc2626; color: #fff; box-shadow: 0 4px 14px rgba(220,38,38,0.3); }
+        .btn-pdf:hover { background: #b91c1c; box-shadow: 0 6px 20px rgba(220,38,38,0.4); }
+
+        /* ---- Page Footer ---- */
+        .page-footer {
+            text-align: center; padding: 20px 16px 28px;
+            color: #6b7280; font-size: 0.8rem;
+        }
+        .page-footer a {
+            color: #93a3bb; text-decoration: none;
+        }
+        .page-footer a:hover { color: #fff; text-decoration: underline; }
 
         /* ---- Loader overlay ---- */
         #loader {
             position: fixed; inset: 0;
-            background: #e8e4df;
+            background: #1a1a2e;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             z-index: 9999;
@@ -170,8 +203,8 @@
         #loader.fade-out { opacity: 0; pointer-events: none; }
         .spinner {
             width: 52px; height: 52px;
-            border: 5px solid #d0ccc6;
-            border-top-color: #2563eb;
+            border: 5px solid #2a2a4a;
+            border-top-color: #e94560;
             border-radius: 50%;
             animation: spin 0.75s linear infinite;
             margin-bottom: 18px;
@@ -179,33 +212,28 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #loaderText {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 1rem; color: #555; margin: 0;
+            font-size: 1rem; color: #a8b4c8; margin: 0;
         }
         #loaderText.error {
-            color: #dc2626; font-size: 0.9rem;
+            color: #e94560; font-size: 0.9rem;
             max-width: 340px; text-align: center; line-height: 1.5;
         }
 
         /* Print */
         @media print {
             body { background: #fff; padding: 0; }
-            .control-panel, .btn-row { display: none !important; }
-            .marksheet { border: 1px solid #000; box-shadow: none; max-width: 100%; }
+            .page-header, .control-panel, .btn-row, .page-footer { display: none !important; }
+            .page-body { padding: 0; max-width: 100%; }
+            .marksheet { border: 2px solid #000; box-shadow: none; }
             .input-cell input {
                 border: none !important; background: transparent !important;
                 box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
             }
             table.ms-table th, table.ms-table td { border: 1px solid #000; }
+            table.ms-table { border: 2px solid #000; }
+            .ms-footer .right b { font-weight: bold; }
             .remark-cell { display: none; }
-            .watermark {
-                display: block !important;
-                position: fixed; bottom: 20px; left: 50%;
-                transform: translateX(-50%);
-                font-family: 'Times New Roman', Times, serif;
-                font-size: 0.65rem; color: #ccc;
-            }
         }
-        .watermark { display: none; }
 
         @media (max-width: 700px) {
             body { padding: 10px 4px; }
@@ -220,6 +248,13 @@
         <div class="spinner" id="loaderSpinner"></div>
         <p id="loaderText">Loading subject data&hellip;</p>
     </div>
+
+    <div class="page-header" id="pageHeader">
+        <h1>IOE Internal Marks Predictor</h1>
+        <p>Predict your marksheet or reverse-track teacher marks</p>
+    </div>
+
+    <div class="page-body">
 
     <!-- Control Panel -->
     <div class="control-panel" id="controlsBar" style="display:none;">
@@ -320,6 +355,12 @@
         <button class="btn btn-reset" onclick="resetAll()">&#8634; Reset All</button>
         <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
         <button class="btn btn-pdf" onclick="exportPDF()">&#128196; Export PDF</button>
+    </div>
+
+    </div><!-- end page-body -->
+
+    <div class="page-footer" id="pageFooter">
+        Made by <a href="https://bibeksubedi0001.com.np" target="_blank">Bibek Subedi</a>
     </div>
 
     <script src="data/subject-data.js"></script>
@@ -783,23 +824,31 @@
 
         function exportPDF() {
             var ms = document.getElementById('marksheet');
-            var btns = document.getElementById('btnRow');
-            var ctrl = document.getElementById('controlsBar');
-            ctrl.style.display = 'none';
-            btns.style.display = 'none';
+            // Clone marksheet so we can modify for PDF without affecting page
+            var clone = ms.cloneNode(true);
+            // Replace input fields with their values
+            var inputs = clone.querySelectorAll('input');
+            inputs.forEach(function(inp) {
+                var span = document.createElement('span');
+                span.textContent = inp.value || '';
+                span.style.fontWeight = 'bold';
+                inp.parentNode.replaceChild(span, inp);
+            });
+            // Remove remark column
+            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.style.display = 'none'; });
+            clone.querySelectorAll('th:last-child').forEach(function(el) {
+                if (el.textContent.trim() === 'Remarks') el.style.display = 'none';
+            });
 
             var opt = {
-                margin: [8, 4, 8, 4],
+                margin: [6, 3, 6, 3],
                 filename: 'IOE-Marksheet.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2.5, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(ms).save().then(function() {
-                ctrl.style.display = '';
-                btns.style.display = '';
-            });
+            html2pdf().set(opt).from(clone).save();
         }
 
         // Date
