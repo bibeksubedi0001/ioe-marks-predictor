@@ -8,7 +8,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            background: #f7f6f3;
+            background-color: #fff;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+            background-size: 20px 20px;
             min-height: 100vh;
             padding: 0;
         }
@@ -141,7 +145,7 @@
 
         /* Table */
         .ms-table-wrap { overflow-x: auto; }
-        table.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        table.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; white-space: nowrap; }
         table.ms-table th, table.ms-table td {
             border: 1px solid #444; padding: 6px 5px;
             text-align: center; vertical-align: middle;
@@ -221,7 +225,11 @@
         /* ---- Loader overlay ---- */
         #loader {
             position: fixed; inset: 0;
-            background: #f7f6f3;
+            background-color: #fff;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+            background-size: 20px 20px;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             z-index: 9999;
@@ -351,8 +359,8 @@
             <table class="ms-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width:70px;">Code</th>
-                        <th rowspan="2" style="min-width:190px;">Title</th>
+                        <th rowspan="2" style="width:80px;">Code</th>
+                        <th rowspan="2" style="min-width:160px; white-space:normal;">Title</th>
                         <th colspan="2">Full Marks</th>
                         <th colspan="2">Pass Mark</th>
                         <th colspan="2">Marks Obtained</th>
