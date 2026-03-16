@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOE Internal Marks Predictor</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -86,11 +85,11 @@
         /* ---- Marksheet ---- */
         .marksheet {
             max-width: 1050px; margin: 0 auto; background: #fff;
-            border: 2px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         .ms-header {
             text-align: center; padding: 18px 20px 10px;
-            border-bottom: 2px solid #333;
+            border-bottom: 1px solid #333;
         }
         .ms-header .logo { width: 60px; height: 60px; margin-bottom: 4px; }
         .ms-header h2 { font-size: 1.15rem; font-weight: bold; margin-bottom: 1px; }
@@ -106,7 +105,7 @@
         }
         .ms-info {
             display: flex; justify-content: space-between; flex-wrap: wrap;
-            padding: 8px 20px; border-bottom: 1px solid #333; font-size: 0.85rem;
+            padding: 8px 20px; border-bottom: 1px solid #444; font-size: 0.85rem;
         }
         .ms-info div { margin: 2px 0; }
         .ms-info b { font-weight: bold; }
@@ -115,7 +114,7 @@
         .ms-table-wrap { overflow-x: auto; }
         table.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         table.ms-table th, table.ms-table td {
-            border: 1px solid #333; padding: 6px 5px;
+            border: 1px solid #444; padding: 6px 5px;
             text-align: center; vertical-align: middle;
         }
         table.ms-table thead th {
@@ -150,7 +149,7 @@
         /* Footer */
         .ms-footer {
             display: flex; justify-content: space-between; padding: 12px 20px;
-            border-top: 2px solid #333; font-size: 0.85rem;
+            border-top: 1px solid #333; font-size: 0.85rem;
             flex-wrap: wrap; gap: 10px;
         }
         .ms-footer .left div, .ms-footer .right div { margin: 3px 0; }
@@ -180,8 +179,6 @@
         .btn-reset:hover { background: #d1d5db; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
         .btn-print { background: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.25); }
         .btn-print:hover { background: #14532d; box-shadow: 0 6px 18px rgba(22,101,52,0.35); }
-        .btn-pdf { background: #1e40af; color: #fff; box-shadow: 0 4px 14px rgba(30,64,175,0.25); }
-        .btn-pdf:hover { background: #1e3a8a; box-shadow: 0 6px 18px rgba(30,64,175,0.35); }
 
         /* ---- Page Footer ---- */
         .page-footer {
@@ -227,12 +224,12 @@
         @media print {
             body { background: #fff; padding: 0; }
             .control-panel, .btn-row, .page-header, .page-footer { display: none !important; }
-            .marksheet { border: 1px solid #000; box-shadow: none; max-width: 100%; }
+            .marksheet { border: 1px solid #555; box-shadow: none; max-width: 100%; }
             .input-cell input {
                 border: none !important; background: transparent !important;
                 box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
             }
-            table.ms-table th, table.ms-table td { border: 1px solid #000; }
+            table.ms-table th, table.ms-table td { border: 1px solid #555; }
             .remark-cell { display: none; }
             .watermark {
                 display: block !important;
@@ -362,7 +359,6 @@
     <div class="btn-row" id="btnRow" style="display:none;">
         <button class="btn btn-reset" onclick="resetAll()">&#8634; Reset All</button>
         <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
-        <button class="btn btn-pdf" onclick="exportPDF()">&#128196; Export PDF</button>
     </div>
 
     <!-- Page Footer -->
@@ -829,58 +825,6 @@
         }
 
         function resetAll() { loadSemester(); }
-
-        function exportPDF() {
-            // Clone the marksheet so the original stays untouched
-            var ms = document.getElementById('marksheet');
-            var clone = ms.cloneNode(true);
-
-            // Apply print-like styles to the clone
-            clone.style.border = '1px solid #000';
-            clone.style.boxShadow = 'none';
-            clone.style.maxWidth = '100%';
-
-            // Replace inputs with bold text (same as print)
-            clone.querySelectorAll('input').forEach(function(inp) {
-                var origInp = ms.querySelector('#' + inp.id);
-                var span = document.createElement('span');
-                span.textContent = origInp ? origInp.value : '';
-                span.style.cssText = 'font-family:Times New Roman,serif;font-size:0.85rem;font-weight:bold;';
-                inp.parentNode.replaceChild(span, inp);
-            });
-
-            // Set table borders to black (same as print)
-            clone.querySelectorAll('th, td').forEach(function(el) {
-                el.style.borderColor = '#000';
-            });
-
-            // Remove remark column (same as print)
-            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.remove(); });
-            // Remove the last <th> in each header row (Remarks header)
-            clone.querySelectorAll('thead tr').forEach(function(tr) {
-                var ths = tr.querySelectorAll('th');
-                if (ths.length > 0) {
-                    var last = ths[ths.length - 1];
-                    if (/remark/i.test(last.textContent)) last.remove();
-                }
-            });
-
-            // Create a temporary wrapper
-            var wrapper = document.createElement('div');
-            wrapper.style.cssText = 'background:#fff;padding:0;font-family:Times New Roman,Times,serif;';
-            wrapper.appendChild(clone);
-
-            var opt = {
-                margin: [6, 3, 6, 3],
-                filename: 'IOE-Marksheet.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all'] }
-            };
-
-            html2pdf().set(opt).from(wrapper).save();
-        }
 
         // Date
         document.getElementById('footerDate').textContent = new Date()
