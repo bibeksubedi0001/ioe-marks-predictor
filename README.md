@@ -30,20 +30,21 @@ This tool applies those rules to predict or reverse-engineer the marks.
 ## Project Structure
 
 ```
-├── index.html       # Entry point (auto-redirects to app)
-├── app.html         # Main application
+├── index.html                # Main application
 ├── assets/
-│   └── logo.svg     # TU logo
+│   └── logo.svg              # TU logo
 ├── data/
-│   ├── subject-data.js   # Subject data (JS bundle)
-│   └── subject.json      # Raw subject data source
-├── CNAME            # Custom domain for GitHub Pages
+│   ├── subject-data.js       # Subject data (JS bundle)
+│   └── subject.json          # Raw subject data source
+├── .github/workflows/
+│   └── deploy.yml            # GitHub Pages deploy workflow
+├── CNAME                     # Custom domain for GitHub Pages
 └── README.md
 ```
 
 ## Setup
 
-No build step required — just open `internal-marks-predictor.html` in a browser, or visit the live site.
+No build step required — just open `index.html` in a browser, or visit the live site.
 
 ## Author
 

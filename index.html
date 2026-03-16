@@ -1,10 +1,770 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url=app.html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOE Internal Marks Predictor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #e8e4df;
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        /* ---- Controls ---- */
+        .controls {
+            max-width: 1050px; margin: 0 auto 16px;
+            display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .controls label { font-size: 0.88rem; color: #444; font-weight: 600; }
+        .controls select {
+            padding: 7px 14px; border-radius: 6px; border: 1px solid #aaa;
+            font-size: 0.88rem; background: #fff; cursor: pointer;
+        }
+        .mode-toggle {
+            display: inline-flex;
+            border: 2px solid #2563eb; border-radius: 8px; overflow: hidden;
+        }
+        .mode-toggle button {
+            padding: 7px 18px; border: none; background: #fff;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            color: #2563eb; font-family: 'Segoe UI', sans-serif;
+            transition: background 0.2s, color 0.2s;
+        }
+        .mode-toggle button.active { background: #2563eb; color: #fff; }
+
+        .name-bar {
+            max-width: 1050px; margin: 0 auto 16px;
+            display: flex; align-items: center; gap: 12px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .name-bar label { font-size: 0.88rem; color: #444; font-weight: 600; }
+        .name-bar input {
+            padding: 7px 14px; border-radius: 6px; border: 1px solid #aaa;
+            font-size: 0.9rem; width: 320px;
+        }
+
+        /* ---- Marksheet ---- */
+        .marksheet {
+            max-width: 1050px; margin: 0 auto; background: #fff;
+            border: 2px solid #333; box-shadow: 3px 3px 12px rgba(0,0,0,0.15);
+        }
+        .ms-header {
+            text-align: center; padding: 18px 20px 10px;
+            border-bottom: 2px solid #333;
+        }
+        .ms-header .logo { width: 60px; height: 60px; margin-bottom: 4px; }
+        .ms-header h2 { font-size: 1.15rem; font-weight: bold; margin-bottom: 1px; }
+        .ms-header h3 { font-size: 1rem; font-weight: bold; }
+        .ms-header p { font-size: 0.85rem; margin-top: 2px; }
+        .ms-header .exam-title {
+            font-weight: bold; font-size: 0.95rem; margin-top: 5px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ms-header .sheet-title {
+            font-size: 1.1rem; font-weight: bold;
+            text-decoration: underline; margin-top: 3px;
+        }
+        .ms-info {
+            display: flex; justify-content: space-between; flex-wrap: wrap;
+            padding: 8px 20px; border-bottom: 1px solid #333; font-size: 0.85rem;
+        }
+        .ms-info div { margin: 2px 0; }
+        .ms-info b { font-weight: bold; }
+
+        /* Table */
+        .ms-table-wrap { overflow-x: auto; }
+        table.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        table.ms-table th, table.ms-table td {
+            border: 1px solid #333; padding: 6px 5px;
+            text-align: center; vertical-align: middle;
+        }
+        table.ms-table thead th {
+            background: #f0ede6; font-weight: bold; font-size: 0.74rem;
+        }
+        table.ms-table tbody td:first-child,
+        table.ms-table tbody td:nth-child(2) { text-align: left; padding-left: 8px; }
+
+        .input-cell input {
+            width: 52px; padding: 5px 3px; border: 1px solid #bbb; border-radius: 4px;
+            text-align: center; font-size: 0.85rem; font-family: 'Times New Roman', serif;
+            transition: all 0.2s;
+        }
+        .input-cell input:focus {
+            border-color: #2563eb; outline: none;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.15); background: #fff;
+        }
+        .input-cell input::placeholder { color: #ccc; font-size: 0.72rem; }
+        .input-cell input.inp-green { background: #f0fff0; }
+        .input-cell input.inp-blue { background: #eef3ff; }
+        .na-dash { color: #aaa; }
+        .grade-cell { font-weight: bold; font-size: 0.88rem; }
+        .grade-cell.ng { color: #dc2626; }
+        .remark-cell { font-size: 0.72rem; max-width: 120px; }
+        .remark-cell .pred-asst { font-weight: bold; }
+        .remark-cell .pred-ok { color: #166534; }
+        .remark-cell .pred-warn { color: #92400e; }
+        .remark-cell .pred-bad { color: #991b1b; }
+        .remark-cell .pred-exact { color: #999; font-size: 0.65rem; }
+        .remark-cell .rev-val { color: #2563eb; font-weight: 600; }
+
+        /* Footer */
+        .ms-footer {
+            display: flex; justify-content: space-between; padding: 12px 20px;
+            border-top: 2px solid #333; font-size: 0.85rem;
+            flex-wrap: wrap; gap: 10px;
+        }
+        .ms-footer .left div, .ms-footer .right div { margin: 3px 0; }
+        .ms-footer .right { text-align: right; }
+        .ms-footer b { font-weight: bold; }
+        .ms-bottom {
+            display: flex; justify-content: space-between;
+            padding: 6px 20px 12px; font-size: 0.78rem; color: #666;
+        }
+
+        /* Buttons */
+        .btn-row {
+            max-width: 1050px; margin: 18px auto 0;
+            display: flex; gap: 12px; flex-wrap: wrap;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .btn {
+            padding: 11px 32px; border: none; border-radius: 8px;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-reset { background: #e5e7eb; color: #374151; }
+        .btn-print { background: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.3); }
+
+        /* ---- Loader overlay ---- */
+        #loader {
+            position: fixed; inset: 0;
+            background: #e8e4df;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+        #loader.fade-out { opacity: 0; pointer-events: none; }
+        .spinner {
+            width: 52px; height: 52px;
+            border: 5px solid #d0ccc6;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin-bottom: 18px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #loaderText {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1rem; color: #555; margin: 0;
+        }
+        #loaderText.error {
+            color: #dc2626; font-size: 0.9rem;
+            max-width: 340px; text-align: center; line-height: 1.5;
+        }
+
+        /* Print */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .controls, .name-bar, .btn-row { display: none !important; }
+            .marksheet { border: 1px solid #000; box-shadow: none; max-width: 100%; }
+            .input-cell input {
+                border: none !important; background: transparent !important;
+                box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
+            }
+            table.ms-table th, table.ms-table td { border: 1px solid #000; }
+            .remark-cell { display: none; }
+            .watermark {
+                display: block !important;
+                position: fixed; bottom: 20px; left: 50%;
+                transform: translateX(-50%);
+                font-family: 'Segoe UI', sans-serif;
+                font-size: 0.65rem; color: #ccc;
+            }
+        }
+        .watermark { display: none; }
+
+        @media (max-width: 700px) {
+            body { padding: 10px 4px; }
+            .ms-header { padding: 10px 8px 6px; }
+            .ms-info { padding: 6px 10px; font-size: 0.78rem; }
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting to <a href="app.html">IOE Internal Marks Predictor</a>...</p>
+
+    <div id="loader">
+        <div class="spinner" id="loaderSpinner"></div>
+        <p id="loaderText">Loading subject data&hellip;</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" id="controlsBar" style="display:none;">
+        <label>Faculty:</label>
+        <select id="facSelect" onchange="onFacultyChange()"></select>
+        <label>Semester:</label>
+        <select id="semSelect" onchange="loadSemester()"></select>
+        <label style="margin-left:12px;">Mode:</label>
+        <div class="mode-toggle">
+            <button id="modePredict" class="active" onclick="setMode('predict')">Predict &rarr; Marksheet (Before Result) </button>
+            <button id="modeReverse" onclick="setMode('reverse')">Reverse &larr; Track Teacher (After Result) </button>
+        </div>
+    </div>
+
+    <div class="name-bar" id="nameBar" style="display:none;">
+        <label>Student Full Name:</label>
+        <input type="text" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+    </div>
+
+    <!-- Marksheet -->
+    <div class="marksheet" id="marksheet" style="display:none;">
+        <div class="ms-header">
+            <img src="assets/logo.svg" alt="TU Logo" class="logo" onerror="this.style.display='none'"><br>
+            <h2>Tribhuvan University</h2>
+            <h3>Institute of Engineering</h3>
+            <p><b>Examination Control Division</b></p>
+            <p>Chakupat, Lalitpur</p>
+            <p class="exam-title" id="examTitle">Regular Examination</p>
+            <p class="sheet-title">GRADE SHEET</p>
+        </div>
+
+        <div class="ms-info">
+            <div>
+                <div>Name: <b id="infoName">___________________________</b></div>
+                <div>Level: <b>Bachelor in Engineering</b></div>
+                <div>Campus: <b>Pulchowk Campus</b></div>
+            </div>
+            <div style="text-align:right;">
+                <div>Programme: <b id="infoProgramme">Civil Engineering</b></div>
+                <div>Year/Part: <b id="infoYearPart">I/I</b></div>
+            </div>
+        </div>
+
+        <div class="ms-table-wrap">
+            <table class="ms-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width:70px;">Code</th>
+                        <th rowspan="2" style="min-width:190px;">Title</th>
+                        <th colspan="2">Full Marks</th>
+                        <th colspan="2">Pass Mark</th>
+                        <th colspan="2">Marks Obtained</th>
+                        <th rowspan="2">Total<br>Marks</th>
+                        <th rowspan="2">Grade</th>
+                        <th rowspan="2" style="min-width:90px;">Remarks</th>
+                    </tr>
+                    <tr>
+                        <th>Asst.</th>
+                        <th>Final</th>
+                        <th>Asst.</th>
+                        <th>Final</th>
+                        <th>Asst.</th>
+                        <th>Final</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="ms-footer">
+            <div class="left">
+                <div>Marks Entered by: ___________</div>
+                <div>Verified by: ___________</div>
+                <div>Date: <b id="footerDate"></b></div>
+            </div>
+            <div class="right">
+                <div>Grade: <b id="footerGrade">&mdash;</b></div>
+                <div>Grade Point Average (GPA): <b id="footerGPA">&mdash;</b></div>
+                <div style="font-size:0.7rem;color:#888;margin-top:1px;">GPA may have &plusmn;0.02 difference from actual</div>
+                <div>Result: <b id="footerResult">&mdash;</b></div>
+            </div>
+        </div>
+
+        <div class="ms-bottom">
+            <span>* - Fail &nbsp;&nbsp; Ab - Absent &nbsp;&nbsp; E - Expelled &nbsp;&nbsp; NU - Not Used</span>
+            <span>Asst. Dean</span>
+        </div>
+    </div>
+
+    <div class="watermark">Sample by Bibek Subedi</div>
+
+    <div class="btn-row" id="btnRow" style="display:none;">
+        <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+        <button class="btn btn-print" onclick="window.print()">&#128424; Print Marksheet</button>
+    </div>
+
+    <script src="data/subject-data.js"></script>
+    <script>
+        /* ============================================================
+           Faculty name mapping
+        ============================================================ */
+        const FACULTY_NAMES = {
+            'BAM': 'Aerospace Engineering',
+            'BAR': 'Architecture',
+            'BCE': 'Civil Engineering',
+            'BCT': 'Computer Engineering',
+            'BEI': 'Electronics, Communication & Information Eng.',
+            'BIE': 'Industrial Engineering',
+            'BME': 'Mechanical Engineering'
+        };
+
+        const SEM_LABELS = {
+            'sem1': 'I / I', 'sem2': 'I / II',
+            'sem3': 'II / I', 'sem4': 'II / II',
+            'sem5': 'III / I'
+        };
+
+        /* ============================================================
+           State
+        ============================================================ */
+        let allData = null;       // processed { faculty: { sem: [subjects] } }
+        let currentSubjects = [];
+        let mode = 'predict';
+
+        /* ============================================================
+           Grading
+        ============================================================ */
+        function getGrade(pct) {
+            if (pct >= 90) return { g: 'A',  gp: 4.0 };
+            if (pct >= 80) return { g: 'A-', gp: 3.8 };
+            if (pct >= 70) return { g: 'B+', gp: 3.5 };
+            if (pct >= 60) return { g: 'B',  gp: 3.2 };
+            if (pct >= 50) return { g: 'B-', gp: 2.7 };
+            if (pct >= 40) return { g: 'C+', gp: 2.4 };
+            return { g: 'NG', gp: 0 };
+        }
+
+        function getOverallGrade(gpa) {
+            if (gpa >= 3.81) return 'A';
+            if (gpa >= 3.61) return 'A-';
+            if (gpa >= 3.20) return 'B+';
+            if (gpa >= 2.80) return 'B';
+            if (gpa >= 2.40) return 'B-';
+            if (gpa >= 2.00) return 'C+';
+            return 'NG';
+        }
+
+        /* ============================================================
+           Derive full marks from theory_load / practical_load
+        ============================================================ */
+        function deriveMarks(r) {
+            // r = { code, name, credit, theory_load, practical_load }
+            var rows = [];
+            var cleanName = r.name.replace(/\s*\[.*$/, '');
+
+            // Theory row
+            if (r.theory_load > 0) {
+                var asstFM, finalFM;
+                if (r.credit >= 3) {
+                    asstFM = 40; finalFM = 60;
+                } else if (r.credit === 2) {
+                    asstFM = 20; finalFM = 30;
+                } else {
+                    asstFM = 10; finalFM = 15;
+                }
+                rows.push({
+                    code: r.code,
+                    title: cleanName,
+                    credit: r.credit,
+                    asstFM: asstFM,
+                    finalFM: finalFM,
+                    passAsst: Math.round(asstFM * 0.4),
+                    passFinal: Math.round(finalFM * 0.4),
+                    practical: false
+                });
+            }
+
+            // Practical row
+            if (r.practical_load > 0) {
+                var prFM = r.practical_load >= 3 ? 50 : 25;
+                // Chemistry practicals are 25 FM despite practical_load=3
+                if (/chemistry/i.test(r.name) && r.practical_load <= 3) prFM = 25;
+                rows.push({
+                    code: r.code,
+                    title: r.theory_load > 0 ? cleanName + ' (Practical)' : cleanName,
+                    credit: r.theory_load > 0 ? 0 : r.credit,
+                    asstFM: prFM,
+                    finalFM: 0,
+                    passAsst: Math.round(prFM * 0.4),
+                    passFinal: 0,
+                    practical: true
+                });
+            }
+
+            // Pure project/thesis (no theory, no practical_load but has credits)
+            if (r.theory_load === 0 && r.practical_load === 0 && r.credit > 0) {
+                // Survey Camp: 50 Asst + 50 Final
+                if (/survey camp/i.test(r.name)) {
+                    rows.push({
+                        code: r.code,
+                        title: cleanName,
+                        credit: r.credit,
+                        asstFM: 50,
+                        finalFM: 50,
+                        passAsst: 20,
+                        passFinal: 20,
+                        practical: false
+                    });
+                } else {
+                    var fm = r.credit >= 4 ? 100 : r.credit >= 2 ? 50 : 25;
+                    rows.push({
+                        code: r.code,
+                        title: cleanName,
+                        credit: r.credit,
+                        asstFM: fm,
+                        finalFM: 0,
+                        passAsst: Math.round(fm * 0.4),
+                        passFinal: 0,
+                        practical: true
+                    });
+                }
+            }
+
+            return rows;
+        }
+
+        /* ============================================================
+           Load and process subject.json
+        ============================================================ */
+        function showUI(raw) {
+            processData(raw);
+            populateFacultySelect();
+            onFacultyChange();
+            var loader = document.getElementById('loader');
+            loader.classList.add('fade-out');
+            setTimeout(function() { loader.style.display = 'none'; }, 420);
+            ['controlsBar','nameBar','marksheet','btnRow']
+                .forEach(function(id) { document.getElementById(id).style.display = ''; });
+        }
+
+        function init() {
+            if (typeof SUBJECT_DATA !== 'undefined') {
+                showUI(SUBJECT_DATA);
+            } else {
+                document.getElementById('loaderSpinner').style.display = 'none';
+                var t = document.getElementById('loaderText');
+                t.textContent = 'Could not load subject data. Make sure data/subject-data.js exists.';
+                t.className = 'error';
+            }
+        }
+
+        function processData(raw) {
+            allData = {};
+            var results = raw.results || [];
+
+            // Group subjects by faculty -> semester, picking latest batch_year
+            // facSemBatch[fac][sem] = { maxBatch, codes: Set }
+            var facSemBatch = {};
+            results.forEach(function(r) {
+                r.academic_classes.forEach(function(ac) {
+                    var fac = ac.faculty;
+                    var sem = ac.semester;
+                    if (!fac.startsWith('B')) return; // skip masters (M*)
+                    if (!facSemBatch[fac]) facSemBatch[fac] = {};
+                    if (!facSemBatch[fac][sem]) facSemBatch[fac][sem] = { maxBatch: 0, codes: {} };
+                    var entry = facSemBatch[fac][sem];
+                    var by = ac.batch_year;
+                    if (!entry.codes[r.code]) entry.codes[r.code] = { batch: 0, data: null };
+                    if (by >= entry.codes[r.code].batch) {
+                        entry.codes[r.code].batch = by;
+                        entry.codes[r.code].data = r;
+                    }
+                });
+            });
+
+            // For each faculty/semester, pick subjects from the latest batch
+            for (var fac in facSemBatch) {
+                allData[fac] = {};
+                var sems = Object.keys(facSemBatch[fac]).sort(function(a, b) {
+                    return parseInt(a.replace('sem','')) - parseInt(b.replace('sem',''));
+                });
+                sems.forEach(function(sem) {
+                    var entry = facSemBatch[fac][sem];
+                    // Find the max batch year across all subjects for this semester
+                    var maxBatch = 0;
+                    for (var code in entry.codes) {
+                        if (entry.codes[code].batch > maxBatch) maxBatch = entry.codes[code].batch;
+                    }
+                    // Take subjects from the max batch
+                    var subjects = [];
+                    var seenCodes = new Set();
+                    for (var code in entry.codes) {
+                        if (entry.codes[code].batch === maxBatch && !seenCodes.has(code)) {
+                            seenCodes.add(code);
+                            var r = entry.codes[code].data;
+                            var rows = deriveMarks({
+                                code: r.code,
+                                name: r.name,
+                                credit: r.credit,
+                                theory_load: r.theory_load,
+                                practical_load: r.practical_load
+                            });
+                            rows.forEach(function(row) { subjects.push(row); });
+                        }
+                    }
+                    if (subjects.length > 0) {
+                        subjects.sort(function(a, b) { return a.code.localeCompare(b.code); });
+                        allData[fac][sem] = subjects;
+                    }
+                });
+            }
+        }
+
+        /* ============================================================
+           UI: Dropdowns
+        ============================================================ */
+        function populateFacultySelect() {
+            var sel = document.getElementById('facSelect');
+            sel.innerHTML = '';
+            var facs = Object.keys(allData).sort();
+            facs.forEach(function(f) {
+                var opt = document.createElement('option');
+                opt.value = f;
+                opt.textContent = f + ' \u2014 ' + (FACULTY_NAMES[f] || f);
+                sel.appendChild(opt);
+            });
+        }
+
+        function onFacultyChange() {
+            var fac = document.getElementById('facSelect').value;
+            var info = FACULTY_NAMES[fac] || fac;
+            document.getElementById('infoProgramme').textContent = info;
+
+            var semSel = document.getElementById('semSelect');
+            semSel.innerHTML = '';
+            var sems = Object.keys(allData[fac]).filter(function(s) {
+                return parseInt(s.replace('sem','')) <= 5;
+            }).sort(function(a, b) {
+                return parseInt(a.replace('sem','')) - parseInt(b.replace('sem',''));
+            });
+            sems.forEach(function(s) {
+                var opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = SEM_LABELS[s] || s;
+                semSel.appendChild(opt);
+            });
+            loadSemester();
+        }
+
+        function loadSemester() {
+            var fac = document.getElementById('facSelect').value;
+            var sem = document.getElementById('semSelect').value;
+            if (!allData[fac] || !allData[fac][sem]) return;
+            currentSubjects = allData[fac][sem];
+            document.getElementById('infoYearPart').textContent = SEM_LABELS[sem] || sem;
+            document.getElementById('examTitle').textContent = 'Regular Examination';
+            clearFooter();
+            buildTable();
+        }
+
+        /* ============================================================
+           Prediction
+        ============================================================ */
+        function forwardPredict(teacherAsst, extFinal, s) {
+            var extPct = (extFinal / s.finalFM) * 100;
+            var intPct = (teacherAsst / s.asstFM) * 100;
+            var diff = intPct - extPct;
+            var predicted = teacherAsst;
+            var status = 'ok';
+
+            if (extPct < 80 && diff > 20) {
+                var rp = (diff - 20) * 2;
+                if (rp > 100) rp = 100;
+                predicted = teacherAsst * (100 - rp) / 100;
+                status = rp > 30 ? 'bad' : 'warn';
+            }
+            if (extFinal >= s.passFinal && predicted < s.asstFM * 0.4) {
+                predicted = s.asstFM * 0.4;
+            }
+            var exact = Math.round(predicted * 100) / 100;
+            return { exact: exact, rounded: Math.round(predicted), status: status };
+        }
+
+        function reversePredict(marksheetAsst, extFinal, s) {
+            var extPct = (extFinal / s.finalFM) * 100;
+            if (extPct >= 80) return [marksheetAsst];
+            var minTeacher = Math.round(s.asstFM * 0.4);
+            var matches = [];
+            for (var t = minTeacher; t <= s.asstFM; t++) {
+                if (forwardPredict(t, extFinal, s).rounded === marksheetAsst) {
+                    matches.push(t);
+                }
+            }
+            return matches.length > 0 ? matches : [marksheetAsst];
+        }
+
+        /* ============================================================
+           Mode
+        ============================================================ */
+        function setMode(m) {
+            mode = m;
+            document.getElementById('modePredict').classList.toggle('active', m === 'predict');
+            document.getElementById('modeReverse').classList.toggle('active', m === 'reverse');
+            buildTable();
+        }
+
+        function updateName() {
+            var name = document.getElementById('studentName').value.trim();
+            document.getElementById('infoName').textContent = name || '___________________________';
+        }
+
+        function clearFooter() {
+            document.getElementById('footerGrade').textContent = '\u2014';
+            document.getElementById('footerGPA').textContent = '\u2014';
+            document.getElementById('footerResult').textContent = '\u2014';
+            document.getElementById('footerResult').style.color = '';
+        }
+
+        /* ============================================================
+           Build table
+        ============================================================ */
+        function buildTable() {
+            var tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            currentSubjects.forEach(function(s, i) {
+                var tr = document.createElement('tr');
+                if (s.practical) tr.classList.add('practical');
+                var hasFinal = !s.practical && s.finalFM > 0;
+                var inputClass = mode === 'predict' ? 'inp-green' : 'inp-blue';
+                var asstTitle = mode === 'predict'
+                    ? 'Marks given by teacher (out of ' + s.asstFM + ')'
+                    : 'Marksheet Asst. marks (out of ' + s.asstFM + ')';
+                var finalTitle = mode === 'predict'
+                    ? 'Your external score (out of ' + s.finalFM + ')'
+                    : 'Marksheet Final marks (out of ' + s.finalFM + ')';
+
+                tr.innerHTML =
+                    '<td>' + s.code + '</td>' +
+                    '<td>' + s.title + '</td>' +
+                    '<td>' + s.asstFM + '</td>' +
+                    '<td>' + (s.finalFM || '\u2014') + '</td>' +
+                    '<td>' + s.passAsst + '</td>' +
+                    '<td>' + (s.passFinal || '\u2014') + '</td>' +
+                    '<td class="input-cell"><input type="number" class="' + inputClass + '" id="asst_' + i + '" min="0" max="' + s.asstFM + '" placeholder="?" oninput="compute(' + i + ')" title="' + asstTitle + '"></td>' +
+                    '<td class="input-cell">' +
+                        (hasFinal
+                            ? '<input type="number" class="' + inputClass + '" id="final_' + i + '" min="0" max="' + s.finalFM + '" placeholder="?" oninput="compute(' + i + ')" title="' + finalTitle + '">'
+                            : '<span class="na-dash">\u2014</span>') +
+                    '</td>' +
+                    '<td id="total_' + i + '">\u2014</td>' +
+                    '<td id="grade_' + i + '">\u2014</td>' +
+                    '<td id="remark_' + i + '" class="remark-cell"></td>';
+                tbody.appendChild(tr);
+            });
+            clearFooter();
+        }
+
+        /* ============================================================
+           Live compute
+        ============================================================ */
+        function compute(i) {
+            var s = currentSubjects[i];
+            var totalEl = document.getElementById('total_' + i);
+            var gradeEl = document.getElementById('grade_' + i);
+            var remarkEl = document.getElementById('remark_' + i);
+            var hasFinal = !s.practical && s.finalFM > 0;
+
+            var asstEl = document.getElementById('asst_' + i);
+            var finalEl = document.getElementById('final_' + i);
+            var asstVal = parseFloat(asstEl ? asstEl.value : '');
+            var finalVal = finalEl ? parseFloat(finalEl.value) : NaN;
+
+            totalEl.textContent = '\u2014';
+            gradeEl.textContent = '\u2014';
+            gradeEl.className = '';
+            remarkEl.innerHTML = '';
+
+            if (isNaN(asstVal) || asstVal < 0 || asstVal > s.asstFM) return;
+
+            // Practical / no final
+            if (s.practical || !hasFinal) {
+                var total = Math.round(asstVal);
+                var totalFM = s.asstFM;
+                var pct = (total / totalFM) * 100;
+                var gr = getGrade(pct);
+                totalEl.textContent = total;
+                gradeEl.textContent = gr.g;
+                gradeEl.className = 'grade-cell' + (gr.g === 'NG' ? ' ng' : '');
+                if (mode === 'reverse') {
+                    remarkEl.innerHTML = '<span class="rev-val">Teacher: ' + total + '</span>';
+                }
+                computeOverall();
+                return;
+            }
+
+            if (isNaN(finalVal) || finalVal < 0 || finalVal > s.finalFM) return;
+
+            if (mode === 'predict') {
+                var res = forwardPredict(asstVal, finalVal, s);
+                var total = res.rounded + Math.round(finalVal);
+                var totalFM = s.asstFM + s.finalFM;
+                var pct = (total / totalFM) * 100;
+                var gr = getGrade(pct);
+                totalEl.textContent = total;
+                gradeEl.textContent = gr.g;
+                gradeEl.className = 'grade-cell' + (gr.g === 'NG' ? ' ng' : '');
+                var cls = res.status === 'ok' ? 'pred-ok' : res.status === 'warn' ? 'pred-warn' : 'pred-bad';
+                var html = '<span class="' + cls + '">Asst&rarr;<span class="pred-asst">' + res.rounded + '</span></span>';
+                if (res.exact !== res.rounded) {
+                    html += '<br><span class="pred-exact">exact: ' + res.exact + '</span>';
+                }
+                if (res.rounded < Math.round(asstVal)) {
+                    html += '<br><span class="pred-bad" style="font-size:0.65rem;">&minus;' + (Math.round(asstVal) - res.rounded) + ' cut</span>';
+                }
+                remarkEl.innerHTML = html;
+            } else {
+                var msAsst = Math.round(asstVal);
+                var total = msAsst + Math.round(finalVal);
+                var totalFM = s.asstFM + s.finalFM;
+                var pct = (total / totalFM) * 100;
+                var gr = getGrade(pct);
+                totalEl.textContent = total;
+                gradeEl.textContent = gr.g;
+                gradeEl.className = 'grade-cell' + (gr.g === 'NG' ? ' ng' : '');
+                var rev = reversePredict(msAsst, finalVal, s);
+                remarkEl.innerHTML = '<span class="rev-val">Teacher: ' + rev.join(', ') + '</span>';
+            }
+            computeOverall();
+        }
+
+        function computeOverall() {
+            var gpSum = 0, count = 0, hasNG = false;
+            currentSubjects.forEach(function(s, i) {
+                var tv = parseFloat(document.getElementById('total_' + i).textContent);
+                if (isNaN(tv)) return;
+                var fm = s.asstFM + (s.finalFM || 0);
+                var gr = getGrade((tv / fm) * 100);
+                if (gr.g === 'NG') hasNG = true;
+                gpSum += gr.gp;
+                count++;
+            });
+            if (count > 0) {
+                var gpa = gpSum / count;
+                document.getElementById('footerGPA').textContent = gpa.toFixed(2);
+                document.getElementById('footerGrade').textContent = getOverallGrade(gpa);
+                document.getElementById('footerResult').textContent = hasNG ? 'Fail' : 'Pass';
+                document.getElementById('footerResult').style.color = hasNG ? '#dc2626' : '#166534';
+            } else {
+                clearFooter();
+            }
+        }
+
+        function resetAll() { loadSemester(); }
+
+        // Date
+        document.getElementById('footerDate').textContent = new Date()
+            .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+
+        // Init
+        init();
+    </script>
 </body>
 </html>
