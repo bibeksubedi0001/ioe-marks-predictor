@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOE Internal Marks Predictor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -13,47 +14,49 @@
             padding: 30px 15px;
         }
 
-        /* ---- Controls ---- */
-        .controls {
-            max-width: 1050px; margin: 0 auto 18px;
-            background: #fff; border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            padding: 18px 24px;
+        /* ---- Control Panel ---- */
+        .control-panel {
+            max-width: 1050px; margin: 0 auto 20px;
+            background: #fff; border: 1px solid #c8c4bf;
+            border-radius: 10px; padding: 18px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        .ctrl-row {
-            display: flex; align-items: center; gap: 16px;
-            flex-wrap: wrap; margin-bottom: 14px;
+        .control-row {
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            margin-bottom: 14px;
         }
-        .ctrl-row:last-child { margin-bottom: 0; }
-        .ctrl-row label {
-            font-size: 0.9rem; color: #333; font-weight: bold;
+        .control-row:last-child { margin-bottom: 0; }
+        .control-row label {
+            font-size: 0.9rem; color: #333; font-weight: 700;
             min-width: fit-content;
         }
-        .ctrl-row select {
-            padding: 8px 14px; border-radius: 6px; border: 1px solid #bbb;
-            font-size: 0.88rem; background: #fafafa; cursor: pointer;
+        .control-row select {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid #aaa;
+            font-size: 0.88rem; background: #faf9f7; cursor: pointer;
             font-family: 'Times New Roman', Times, serif;
         }
-        .ctrl-row select:focus { border-color: #2563eb; outline: none; }
+        .control-row select:focus { border-color: #2563eb; outline: none; }
         .mode-toggle {
             display: inline-flex;
             border: 2px solid #2563eb; border-radius: 8px; overflow: hidden;
-            margin-left: auto;
         }
         .mode-toggle button {
             padding: 8px 20px; border: none; background: #fff;
-            font-size: 0.85rem; font-weight: bold; cursor: pointer;
+            font-size: 0.88rem; font-weight: 700; cursor: pointer;
             color: #2563eb; font-family: 'Times New Roman', Times, serif;
             transition: background 0.2s, color 0.2s;
         }
         .mode-toggle button.active { background: #2563eb; color: #fff; }
         .mode-toggle button:hover:not(.active) { background: #eef3ff; }
-        .name-input {
-            padding: 8px 14px; border-radius: 6px; border: 1px solid #bbb;
-            font-size: 0.95rem; width: 340px;
+        .control-row input[type="text"] {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid #aaa;
+            font-size: 0.92rem; width: 340px;
             font-family: 'Times New Roman', Times, serif;
         }
-        .name-input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.12); }
+        .control-row input[type="text"]:focus { border-color: #2563eb; outline: none; }
+        .control-divider {
+            height: 1px; background: #e5e2dd; margin: 2px 0;
+        }
 
         /* ---- Marksheet ---- */
         .marksheet {
@@ -137,10 +140,11 @@
         .btn-row {
             max-width: 1050px; margin: 18px auto 0;
             display: flex; gap: 12px; flex-wrap: wrap;
+            justify-content: center;
         }
         .btn {
-            padding: 11px 28px; border: none; border-radius: 8px;
-            font-size: 0.9rem; font-weight: bold; cursor: pointer;
+            padding: 11px 32px; border: none; border-radius: 8px;
+            font-size: 0.92rem; font-weight: 700; cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
             font-family: 'Times New Roman', Times, serif;
             display: inline-flex; align-items: center; gap: 8px;
@@ -151,8 +155,8 @@
         .btn-reset:hover { background: #d1d5db; }
         .btn-print { background: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.3); }
         .btn-print:hover { background: #14532d; }
-        .btn-pdf { background: #1d4ed8; color: #fff; box-shadow: 0 4px 14px rgba(29,78,216,0.3); }
-        .btn-pdf:hover { background: #1e40af; }
+        .btn-pdf { background: #1e40af; color: #fff; box-shadow: 0 4px 14px rgba(30,64,175,0.3); }
+        .btn-pdf:hover { background: #1e3a8a; }
 
         /* ---- Loader overlay ---- */
         #loader {
@@ -185,14 +189,13 @@
         /* Print */
         @media print {
             body { background: #fff; padding: 0; }
-            .controls, .btn-row { display: none !important; }
-            .marksheet { border: 2px solid #000; box-shadow: none; max-width: 100%; }
+            .control-panel, .btn-row { display: none !important; }
+            .marksheet { border: 1px solid #000; box-shadow: none; max-width: 100%; }
             .input-cell input {
                 border: none !important; background: transparent !important;
                 box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
             }
             table.ms-table th, table.ms-table td { border: 1px solid #000; }
-            table.ms-table td:last-child { border-right: 1px solid #000; }
             .remark-cell { display: none; }
             .watermark {
                 display: block !important;
@@ -218,21 +221,26 @@
         <p id="loaderText">Loading subject data&hellip;</p>
     </div>
 
-    <!-- Controls -->
-    <div class="controls" id="controlsBar" style="display:none;">
-        <div class="ctrl-row">
+    <!-- Control Panel -->
+    <div class="control-panel" id="controlsBar" style="display:none;">
+        <div class="control-row">
             <label>Faculty:</label>
             <select id="facSelect" onchange="onFacultyChange()"></select>
             <label>Semester:</label>
             <select id="semSelect" onchange="loadSemester()"></select>
+        </div>
+        <div class="control-divider"></div>
+        <div class="control-row">
+            <label>Mode:</label>
             <div class="mode-toggle">
                 <button id="modePredict" class="active" onclick="setMode('predict')">Predict &rarr; Marksheet</button>
                 <button id="modeReverse" onclick="setMode('reverse')">Reverse &larr; Track Teacher</button>
             </div>
         </div>
-        <div class="ctrl-row">
+        <div class="control-divider"></div>
+        <div class="control-row">
             <label>Student Name:</label>
-            <input type="text" class="name-input" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+            <input type="text" id="studentName" placeholder="Enter your full name" oninput="updateName()">
         </div>
     </div>
 
@@ -309,7 +317,7 @@
     <div class="watermark">Sample by Bibek Subedi</div>
 
     <div class="btn-row" id="btnRow" style="display:none;">
-        <button class="btn btn-reset" onclick="resetAll()">&#8635; Reset All</button>
+        <button class="btn btn-reset" onclick="resetAll()">&#8634; Reset All</button>
         <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
         <button class="btn btn-pdf" onclick="exportPDF()">&#128196; Export PDF</button>
     </div>
@@ -353,18 +361,6 @@
             if (pct >= 50) return { g: 'B-', gp: 2.7 };
             if (pct >= 40) return { g: 'C+', gp: 2.4 };
             return { g: 'NG', gp: 0 };
-        }
-
-        /* Calibrated grade points for GPA calculation
-           (derived from real IOE marksheets to match within ±0.02) */
-        function getGPAPoint(pct) {
-            if (pct >= 90) return 4.0;
-            if (pct >= 80) return 3.9;
-            if (pct >= 70) return 3.7;
-            if (pct >= 60) return 3.0;
-            if (pct >= 50) return 2.7;
-            if (pct >= 40) return 2.4;
-            return 0;
         }
 
         function getOverallGrade(gpa) {
@@ -767,9 +763,9 @@
                 var tv = parseFloat(document.getElementById('total_' + i).textContent);
                 if (isNaN(tv)) return;
                 var fm = s.asstFM + (s.finalFM || 0);
-                var pct = (tv / fm) * 100;
-                if (getGrade(pct).g === 'NG') hasNG = true;
-                gpSum += getGPAPoint(pct);
+                var gr = getGrade((tv / fm) * 100);
+                if (gr.g === 'NG') hasNG = true;
+                gpSum += gr.gp;
                 count++;
             });
             if (count > 0) {
@@ -787,36 +783,23 @@
 
         function exportPDF() {
             var ms = document.getElementById('marksheet');
-            var ctrl = document.getElementById('controlsBar');
             var btns = document.getElementById('btnRow');
-            var remarks = document.querySelectorAll('.remark-cell');
-            var inputs = ms.querySelectorAll('.input-cell input');
-
-            // Temporarily style for PDF
+            var ctrl = document.getElementById('controlsBar');
             ctrl.style.display = 'none';
             btns.style.display = 'none';
-            remarks.forEach(function(r) { r.style.display = 'none'; });
-            inputs.forEach(function(inp) {
-                inp.dataset.oldBorder = inp.style.border;
-                inp.dataset.oldBg = inp.style.background;
-                inp.style.border = 'none';
-                inp.style.background = 'transparent';
-                inp.style.fontWeight = 'bold';
-            });
-            ms.style.boxShadow = 'none';
 
-            window.print();
+            var opt = {
+                margin: [8, 4, 8, 4],
+                filename: 'IOE-Marksheet.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
 
-            // Restore
-            ctrl.style.display = '';
-            btns.style.display = '';
-            remarks.forEach(function(r) { r.style.display = ''; });
-            inputs.forEach(function(inp) {
-                inp.style.border = inp.dataset.oldBorder || '';
-                inp.style.background = inp.dataset.oldBg || '';
-                inp.style.fontWeight = '';
+            html2pdf().set(opt).from(ms).save().then(function() {
+                ctrl.style.display = '';
+                btns.style.display = '';
             });
-            ms.style.boxShadow = '';
         }
 
         // Date
