@@ -15,37 +15,45 @@
 
         /* ---- Controls ---- */
         .controls {
-            max-width: 1050px; margin: 0 auto 16px;
-            display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-            font-family: 'Segoe UI', sans-serif;
+            max-width: 1050px; margin: 0 auto 18px;
+            background: #fff; border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 18px 24px;
         }
-        .controls label { font-size: 0.88rem; color: #444; font-weight: 600; }
-        .controls select {
-            padding: 7px 14px; border-radius: 6px; border: 1px solid #aaa;
-            font-size: 0.88rem; background: #fff; cursor: pointer;
+        .ctrl-row {
+            display: flex; align-items: center; gap: 16px;
+            flex-wrap: wrap; margin-bottom: 14px;
         }
+        .ctrl-row:last-child { margin-bottom: 0; }
+        .ctrl-row label {
+            font-size: 0.9rem; color: #333; font-weight: bold;
+            min-width: fit-content;
+        }
+        .ctrl-row select {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid #bbb;
+            font-size: 0.88rem; background: #fafafa; cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .ctrl-row select:focus { border-color: #2563eb; outline: none; }
         .mode-toggle {
             display: inline-flex;
             border: 2px solid #2563eb; border-radius: 8px; overflow: hidden;
+            margin-left: auto;
         }
         .mode-toggle button {
-            padding: 7px 18px; border: none; background: #fff;
-            font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            color: #2563eb; font-family: 'Segoe UI', sans-serif;
+            padding: 8px 20px; border: none; background: #fff;
+            font-size: 0.85rem; font-weight: bold; cursor: pointer;
+            color: #2563eb; font-family: 'Times New Roman', Times, serif;
             transition: background 0.2s, color 0.2s;
         }
         .mode-toggle button.active { background: #2563eb; color: #fff; }
-
-        .name-bar {
-            max-width: 1050px; margin: 0 auto 16px;
-            display: flex; align-items: center; gap: 12px;
-            font-family: 'Segoe UI', sans-serif;
+        .mode-toggle button:hover:not(.active) { background: #eef3ff; }
+        .name-input {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid #bbb;
+            font-size: 0.95rem; width: 340px;
+            font-family: 'Times New Roman', Times, serif;
         }
-        .name-bar label { font-size: 0.88rem; color: #444; font-weight: 600; }
-        .name-bar input {
-            padding: 7px 14px; border-radius: 6px; border: 1px solid #aaa;
-            font-size: 0.9rem; width: 320px;
-        }
+        .name-input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.12); }
 
         /* ---- Marksheet ---- */
         .marksheet {
@@ -129,18 +137,22 @@
         .btn-row {
             max-width: 1050px; margin: 18px auto 0;
             display: flex; gap: 12px; flex-wrap: wrap;
-            font-family: 'Segoe UI', sans-serif;
         }
         .btn {
-            padding: 11px 32px; border: none; border-radius: 8px;
-            font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            padding: 11px 28px; border: none; border-radius: 8px;
+            font-size: 0.9rem; font-weight: bold; cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
+            display: inline-flex; align-items: center; gap: 8px;
         }
         .btn:hover { transform: translateY(-1px); }
         .btn:active { transform: translateY(0); }
         .btn-reset { background: #e5e7eb; color: #374151; }
+        .btn-reset:hover { background: #d1d5db; }
         .btn-print { background: #166534; color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.3); }
+        .btn-print:hover { background: #14532d; }
+        .btn-pdf { background: #1d4ed8; color: #fff; box-shadow: 0 4px 14px rgba(29,78,216,0.3); }
+        .btn-pdf:hover { background: #1e40af; }
 
         /* ---- Loader overlay ---- */
         #loader {
@@ -162,7 +174,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         #loaderText {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1rem; color: #555; margin: 0;
         }
         #loaderText.error {
@@ -173,19 +185,20 @@
         /* Print */
         @media print {
             body { background: #fff; padding: 0; }
-            .controls, .name-bar, .btn-row { display: none !important; }
-            .marksheet { border: 1px solid #000; box-shadow: none; max-width: 100%; }
+            .controls, .btn-row { display: none !important; }
+            .marksheet { border: 2px solid #000; box-shadow: none; max-width: 100%; }
             .input-cell input {
                 border: none !important; background: transparent !important;
                 box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
             }
             table.ms-table th, table.ms-table td { border: 1px solid #000; }
+            table.ms-table td:last-child { border-right: 1px solid #000; }
             .remark-cell { display: none; }
             .watermark {
                 display: block !important;
                 position: fixed; bottom: 20px; left: 50%;
                 transform: translateX(-50%);
-                font-family: 'Segoe UI', sans-serif;
+                font-family: 'Times New Roman', Times, serif;
                 font-size: 0.65rem; color: #ccc;
             }
         }
@@ -207,20 +220,20 @@
 
     <!-- Controls -->
     <div class="controls" id="controlsBar" style="display:none;">
-        <label>Faculty:</label>
-        <select id="facSelect" onchange="onFacultyChange()"></select>
-        <label>Semester:</label>
-        <select id="semSelect" onchange="loadSemester()"></select>
-        <label style="margin-left:12px;">Mode:</label>
-        <div class="mode-toggle">
-            <button id="modePredict" class="active" onclick="setMode('predict')">Predict &rarr; Marksheet (Before Result) </button>
-            <button id="modeReverse" onclick="setMode('reverse')">Reverse &larr; Track Teacher (After Result) </button>
+        <div class="ctrl-row">
+            <label>Faculty:</label>
+            <select id="facSelect" onchange="onFacultyChange()"></select>
+            <label>Semester:</label>
+            <select id="semSelect" onchange="loadSemester()"></select>
+            <div class="mode-toggle">
+                <button id="modePredict" class="active" onclick="setMode('predict')">Predict &rarr; Marksheet</button>
+                <button id="modeReverse" onclick="setMode('reverse')">Reverse &larr; Track Teacher</button>
+            </div>
         </div>
-    </div>
-
-    <div class="name-bar" id="nameBar" style="display:none;">
-        <label>Student Full Name:</label>
-        <input type="text" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+        <div class="ctrl-row">
+            <label>Student Name:</label>
+            <input type="text" class="name-input" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+        </div>
     </div>
 
     <!-- Marksheet -->
@@ -296,8 +309,9 @@
     <div class="watermark">Sample by Bibek Subedi</div>
 
     <div class="btn-row" id="btnRow" style="display:none;">
-        <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
-        <button class="btn btn-print" onclick="window.print()">&#128424; Print Marksheet</button>
+        <button class="btn btn-reset" onclick="resetAll()">&#8635; Reset All</button>
+        <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
+        <button class="btn btn-pdf" onclick="exportPDF()">&#128196; Export PDF</button>
     </div>
 
     <script src="data/subject-data.js"></script>
@@ -452,7 +466,7 @@
             var loader = document.getElementById('loader');
             loader.classList.add('fade-out');
             setTimeout(function() { loader.style.display = 'none'; }, 420);
-            ['controlsBar','nameBar','marksheet','btnRow']
+            ['controlsBar','marksheet','btnRow']
                 .forEach(function(id) { document.getElementById(id).style.display = ''; });
         }
 
@@ -770,6 +784,40 @@
         }
 
         function resetAll() { loadSemester(); }
+
+        function exportPDF() {
+            var ms = document.getElementById('marksheet');
+            var ctrl = document.getElementById('controlsBar');
+            var btns = document.getElementById('btnRow');
+            var remarks = document.querySelectorAll('.remark-cell');
+            var inputs = ms.querySelectorAll('.input-cell input');
+
+            // Temporarily style for PDF
+            ctrl.style.display = 'none';
+            btns.style.display = 'none';
+            remarks.forEach(function(r) { r.style.display = 'none'; });
+            inputs.forEach(function(inp) {
+                inp.dataset.oldBorder = inp.style.border;
+                inp.dataset.oldBg = inp.style.background;
+                inp.style.border = 'none';
+                inp.style.background = 'transparent';
+                inp.style.fontWeight = 'bold';
+            });
+            ms.style.boxShadow = 'none';
+
+            window.print();
+
+            // Restore
+            ctrl.style.display = '';
+            btns.style.display = '';
+            remarks.forEach(function(r) { r.style.display = ''; });
+            inputs.forEach(function(inp) {
+                inp.style.border = inp.dataset.oldBorder || '';
+                inp.style.background = inp.dataset.oldBg || '';
+                inp.style.fontWeight = '';
+            });
+            ms.style.boxShadow = '';
+        }
 
         // Date
         document.getElementById('footerDate').textContent = new Date()
