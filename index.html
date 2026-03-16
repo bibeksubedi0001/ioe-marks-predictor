@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOE Internal Marks Predictor</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -21,7 +19,6 @@
             background: #fff; border-radius: 14px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             padding: 20px 24px;
-            font-family: 'Segoe UI', sans-serif;
         }
         .toolbar-row {
             display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
@@ -40,7 +37,6 @@
             padding: 9px 14px; border-radius: 8px; border: 1.5px solid #ddd;
             font-size: 0.88rem; background: #fafafa; cursor: pointer;
             transition: border-color 0.2s, box-shadow 0.2s;
-            font-family: 'Segoe UI', sans-serif;
         }
         .field select:focus, .field input[type="text"]:focus {
             border-color: #2563eb; outline: none;
@@ -55,7 +51,7 @@
         .mode-toggle button {
             padding: 9px 20px; border: none; background: #fff;
             font-size: 0.82rem; font-weight: 600; cursor: pointer;
-            color: #2563eb; font-family: 'Segoe UI', sans-serif;
+            color: #2563eb;
             transition: background 0.2s, color 0.2s;
         }
         .mode-toggle button.active { background: #2563eb; color: #fff; }
@@ -143,13 +139,11 @@
         .btn-row {
             max-width: 1050px; margin: 18px auto 0;
             display: flex; gap: 12px; flex-wrap: wrap;
-            font-family: 'Segoe UI', sans-serif;
         }
         .btn {
             padding: 11px 32px; border: none; border-radius: 8px;
             font-size: 0.9rem; font-weight: 600; cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
-            font-family: 'Segoe UI', sans-serif;
             display: inline-flex; align-items: center; gap: 8px;
         }
         .btn:hover { transform: translateY(-1px); }
@@ -179,7 +173,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         #loaderText {
-            font-family: 'Segoe UI', sans-serif;
             font-size: 1rem; color: #555; margin: 0;
         }
         #loaderText.error {
@@ -202,7 +195,6 @@
                 display: block !important;
                 position: fixed; bottom: 20px; left: 50%;
                 transform: translateX(-50%);
-                font-family: 'Segoe UI', sans-serif;
                 font-size: 0.65rem; color: #ccc;
             }
         }
@@ -329,6 +321,8 @@
         </button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
     <script src="data/subject-data.js"></script>
     <script>
         /* ============================================================
@@ -818,7 +812,8 @@
 
             html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#fff' }).then(function(canvas) {
                 var imgData = canvas.toDataURL('image/png');
-                var pdf = new jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                var jsPDF = window.jspdf.jsPDF;
+                var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 var pageW = pdf.internal.pageSize.getWidth();
                 var pageH = pdf.internal.pageSize.getHeight();
                 var margin = 8;
