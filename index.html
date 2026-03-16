@@ -25,9 +25,8 @@
             display: flex; align-items: center; gap: 10px;
         }
         .top-nav .brand-icon {
-            width: 28px; height: 28px; background: #2563eb;
-            border-radius: 6px; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: #fff; font-size: 0.8rem;
+            width: 28px; height: 28px;
+            border-radius: 4px;
         }
         .top-nav h1 {
             font-size: 1.05rem; font-weight: 700; color: #f1f5f9;
@@ -42,23 +41,6 @@
         .page-wrap {
             max-width: 1080px; margin: 0 auto;
             padding: 26px 18px 40px;
-        }
-
-        /* ---- Mode Banner ---- */
-        .mode-banner {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 20px;
-            padding: 10px 16px;
-            background: #eff6ff; border: 1px solid #bfdbfe;
-            border-radius: 10px;
-            font-size: 0.84rem; color: #1e40af;
-        }
-        .mode-banner.reverse {
-            background: #fef3c7; border-color: #fde68a;
-            color: #92400e;
-        }
-        .mode-banner .mode-icon {
-            font-size: 1.1rem; flex-shrink: 0;
         }
 
         /* ---- Control Panel ---- */
@@ -267,7 +249,7 @@
         /* Print */
         @media print {
             body { background: #fff; padding: 0; }
-            .control-panel, .btn-row, .page-header, .page-footer, .top-nav, .mode-banner { display: none !important; }
+            .control-panel, .btn-row, .page-header, .page-footer, .top-nav { display: none !important; }
             .page-wrap { padding: 0; max-width: 100%; }
             .marksheet { border: 1px solid #555; box-shadow: none; max-width: 100%; }
             .input-cell input {
@@ -306,19 +288,13 @@
     <!-- Top Nav -->
     <nav class="top-nav" id="topNav" style="display:none;">
         <div class="brand">
-            <div class="brand-icon">IOE</div>
-            <h1>Internal Marks Predictor</h1>
+            <img class="brand-icon" src="assets/logo.svg" alt="TU" onerror="this.style.display='none'">
+            <h1>IOE Internal Marks Predictor</h1>
         </div>
         <a class="nav-link" href="https://bibeksubedi0001.com.np" target="_blank">by Bibek Subedi</a>
     </nav>
 
     <div class="page-wrap">
-
-    <!-- Mode Banner -->
-    <div class="mode-banner" id="modeBanner" style="display:none;">
-        <span class="mode-icon" id="modeBannerIcon">&#9654;</span>
-        <span id="modeBannerText"><b>Predict Mode</b> &mdash; Enter teacher marks (Asst.) + external score (Final) to see your predicted marksheet.</span>
-    </div>
 
     <!-- Control Panel -->
     <div class="control-panel" id="controlsBar" style="display:none;">
@@ -571,7 +547,7 @@
             var loader = document.getElementById('loader');
             loader.classList.add('fade-out');
             setTimeout(function() { loader.style.display = 'none'; }, 420);
-            ['topNav','modeBanner','controlsBar','marksheet','btnRow','pageFooter']
+            ['topNav','controlsBar','marksheet','btnRow','pageFooter']
                 .forEach(function(id) { document.getElementById(id).style.display = ''; });
         }
 
@@ -738,18 +714,6 @@
             mode = m;
             document.getElementById('modePredict').classList.toggle('active', m === 'predict');
             document.getElementById('modeReverse').classList.toggle('active', m === 'reverse');
-            var banner = document.getElementById('modeBanner');
-            var icon = document.getElementById('modeBannerIcon');
-            var text = document.getElementById('modeBannerText');
-            if (m === 'predict') {
-                banner.className = 'mode-banner';
-                icon.innerHTML = '&#9654;';
-                text.innerHTML = '<b>Predict Mode</b> &mdash; Enter teacher marks (Asst.) + external score (Final) to see your predicted marksheet.';
-            } else {
-                banner.className = 'mode-banner reverse';
-                icon.innerHTML = '&#9664;';
-                text.innerHTML = '<b>Reverse Mode</b> &mdash; Enter marksheet Asst. &amp; Final marks to find what your teacher originally gave.';
-            }
             buildTable();
         }
 
