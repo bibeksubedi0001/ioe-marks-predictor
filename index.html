@@ -715,6 +715,15 @@
             return matches.length > 0 ? matches : [marksheetAsst];
         }
 
+        function getMaxPossibleAsst(finalVal, s) {
+            var maxAsst = 0;
+            for (var t = 0; t <= s.asstFM; t++) {
+                var pred = forwardPredict(t, finalVal, s);
+                if (pred.rounded > maxAsst) maxAsst = pred.rounded;
+            }
+            return maxAsst;
+        }
+
         /* ============================================================
            Mode
         ============================================================ */
@@ -837,15 +846,21 @@
                 remarkEl.innerHTML = html;
             } else {
                 var msAsst = Math.round(asstVal);
-                var total = msAsst + Math.round(finalVal);
+                var maxPossible = getMaxPossibleAsst(finalVal, s);
+                var displayAsst = msAsst > maxPossible ? maxPossible : msAsst;
+                var total = displayAsst + Math.round(finalVal);
                 var totalFM = s.asstFM + s.finalFM;
                 var pct = (total / totalFM) * 100;
                 var gr = getGrade(pct);
                 totalEl.textContent = total;
                 gradeEl.textContent = gr.g;
                 gradeEl.className = 'grade-cell' + (gr.g === 'NG' ? ' ng' : '');
-                var rev = reversePredict(msAsst, finalVal, s);
-                remarkEl.innerHTML = '<span class="rev-val">Teacher: ' + rev.join(', ') + '</span>';
+                var rev = reversePredict(displayAsst, finalVal, s);
+                var html = '<span class="rev-val">Teacher: ' + rev.join(', ') + '</span>';
+                if (msAsst > maxPossible) {
+                    html += '<br><span class="pred-bad" style="font-size:0.65rem;">Max Asst: ' + maxPossible + ' (Adj: ' + displayAsst + '+' + Math.round(finalVal) + ')</span>';
+                }
+                remarkEl.innerHTML = html;
             }
             computeOverall();
         }
@@ -873,6 +888,90 @@
         }
 
         function resetAll() { loadSemester(); }
+
+        /* ============================================================
+           Print: show corrected assessment marks
+        ============================================================ */
+        var printOrigValues = null;
+        var printOrigFooter = null;
+
+        window.addEventListener('beforeprint', function() {
+            printOrigValues = [];
+            printOrigFooter = {
+                gpa: document.getElementById('footerGPA').textContent,
+                grade: document.getElementById('footerGrade').textContent,
+                result: document.getElementById('footerResult').textContent,
+                resultColor: document.getElementById('footerResult').style.color
+            };
+            var anyAdjusted = false;
+
+            currentSubjects.forEach(function(s, i) {
+                var asstEl = document.getElementById('asst_' + i);
+                var finalEl = document.getElementById('final_' + i);
+                var totalEl = document.getElementById('total_' + i);
+                var gradeEl = document.getElementById('grade_' + i);
+                var hasFinal = !s.practical && s.finalFM > 0;
+
+                if (!asstEl) return;
+
+                printOrigValues.push({
+                    i: i,
+                    asst: asstEl.value,
+                    total: totalEl.textContent,
+                    grade: gradeEl.textContent,
+                    gradeClass: gradeEl.className
+                });
+
+                var asstVal = parseFloat(asstEl.value);
+                var finalVal = finalEl ? parseFloat(finalEl.value) : NaN;
+                if (isNaN(asstVal) || !hasFinal || isNaN(finalVal)) return;
+                if (asstVal < 0 || asstVal > s.asstFM || finalVal < 0 || finalVal > s.finalFM) return;
+
+                if (mode === 'predict') {
+                    // Show the recorrected assessment marks in print
+                    var res = forwardPredict(asstVal, finalVal, s);
+                    asstEl.value = res.rounded;
+                } else if (mode === 'reverse') {
+                    // Cap infeasible Asst values
+                    var msAsst = Math.round(asstVal);
+                    var maxPossible = getMaxPossibleAsst(finalVal, s);
+                    if (msAsst > maxPossible) {
+                        asstEl.value = maxPossible;
+                        var total = maxPossible + Math.round(finalVal);
+                        var totalFM = s.asstFM + s.finalFM;
+                        var pct = (total / totalFM) * 100;
+                        var gr = getGrade(pct);
+                        totalEl.textContent = total;
+                        gradeEl.textContent = gr.g;
+                        gradeEl.className = 'grade-cell' + (gr.g === 'NG' ? ' ng' : '');
+                        anyAdjusted = true;
+                    }
+                }
+            });
+
+            if (anyAdjusted) computeOverall();
+        });
+
+        window.addEventListener('afterprint', function() {
+            if (!printOrigValues) return;
+            printOrigValues.forEach(function(o) {
+                var asstEl = document.getElementById('asst_' + o.i);
+                var totalEl = document.getElementById('total_' + o.i);
+                var gradeEl = document.getElementById('grade_' + o.i);
+                if (asstEl) asstEl.value = o.asst;
+                totalEl.textContent = o.total;
+                gradeEl.textContent = o.grade;
+                gradeEl.className = o.gradeClass;
+            });
+            if (printOrigFooter) {
+                document.getElementById('footerGPA').textContent = printOrigFooter.gpa;
+                document.getElementById('footerGrade').textContent = printOrigFooter.grade;
+                document.getElementById('footerResult').textContent = printOrigFooter.result;
+                document.getElementById('footerResult').style.color = printOrigFooter.resultColor;
+            }
+            printOrigValues = null;
+            printOrigFooter = null;
+        });
 
         // Date
         document.getElementById('footerDate').textContent = new Date()
