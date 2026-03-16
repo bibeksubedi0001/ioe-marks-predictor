@@ -145,7 +145,7 @@
 
         /* Table */
         .ms-table-wrap { overflow-x: auto; }
-        table.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; white-space: nowrap; }
+        table.ms-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         table.ms-table th, table.ms-table td {
             border: 1px solid #444; padding: 6px 5px;
             text-align: center; vertical-align: middle;
@@ -256,27 +256,15 @@
 
         /* Print */
         @media print {
-            body { background: #fff; padding: 0; font-size: 9pt; }
+            body { background: #fff; padding: 0; }
             .control-panel, .btn-row, .page-header, .page-footer, .top-nav { display: none !important; }
             .page-wrap { padding: 0; max-width: 100%; }
             .marksheet { border: 1px solid #555; box-shadow: none; max-width: 100%; }
-            .ms-header { padding: 10px 14px 6px; }
-            .ms-header h2 { font-size: 0.95rem; }
-            .ms-header h3 { font-size: 0.85rem; }
-            .ms-header p { font-size: 0.72rem; }
-            .ms-header .exam-title { font-size: 0.8rem; }
-            .ms-header .sheet-title { font-size: 0.9rem; }
-            .ms-info { font-size: 0.72rem; padding: 5px 14px; }
-            table.ms-table { font-size: 0.68rem; }
-            table.ms-table th { font-size: 0.64rem; }
-            table.ms-table th, table.ms-table td { border: 1px solid #555; padding: 3px 4px; }
             .input-cell input {
                 border: none !important; background: transparent !important;
                 box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
-                font-size: 0.72rem;
             }
-            .ms-footer { font-size: 0.72rem; padding: 8px 14px; }
-            .ms-bottom { font-size: 0.65rem; padding: 4px 14px 8px; }
+            table.ms-table th, table.ms-table td { border: 1px solid #555; }
             .remark-cell { display: none; }
             .watermark {
                 display: block !important;
@@ -371,8 +359,8 @@
             <table class="ms-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width:80px;">Code</th>
-                        <th rowspan="2" style="min-width:160px; white-space:normal;">Title</th>
+                        <th rowspan="2" style="width:70px;">Code</th>
+                        <th rowspan="2" style="min-width:190px;">Title</th>
                         <th colspan="2">Full Marks</th>
                         <th colspan="2">Pass Mark</th>
                         <th colspan="2">Marks Obtained</th>
