@@ -9,24 +9,29 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            background: #1a1a2e;
+            background: #eef2f7;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(37,99,235,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(233,69,96,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(22,101,52,0.03) 0%, transparent 60%);
             min-height: 100vh;
             padding: 0;
         }
 
         /* ---- Page Header ---- */
         .page-header {
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);
             padding: 28px 20px 22px;
             text-align: center;
             border-bottom: 3px solid #e94560;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
         }
         .page-header h1 {
             color: #fff; font-size: 1.6rem; font-weight: 700;
             letter-spacing: 0.5px; margin-bottom: 4px;
         }
         .page-header p {
-            color: #a8b4c8; font-size: 0.88rem;
+            color: #c5d3e8; font-size: 0.88rem;
         }
 
         .page-body {
@@ -184,17 +189,20 @@
         /* ---- Page Footer ---- */
         .page-footer {
             text-align: center; padding: 20px 16px 28px;
-            color: #6b7280; font-size: 0.8rem;
+            color: #7a8599; font-size: 0.8rem;
         }
         .page-footer a {
-            color: #93a3bb; text-decoration: none;
+            color: #4a6fa5; text-decoration: none; font-weight: 600;
         }
-        .page-footer a:hover { color: #fff; text-decoration: underline; }
+        .page-footer a:hover { color: #1e3a5f; text-decoration: underline; }
 
         /* ---- Loader overlay ---- */
         #loader {
             position: fixed; inset: 0;
-            background: #1a1a2e;
+            background: #eef2f7;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(37,99,235,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(233,69,96,0.05) 0%, transparent 50%);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             z-index: 9999;
@@ -203,7 +211,7 @@
         #loader.fade-out { opacity: 0; pointer-events: none; }
         .spinner {
             width: 52px; height: 52px;
-            border: 5px solid #2a2a4a;
+            border: 5px solid #d0d6e0;
             border-top-color: #e94560;
             border-radius: 50%;
             animation: spin 0.75s linear infinite;
@@ -212,27 +220,46 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #loaderText {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 1rem; color: #a8b4c8; margin: 0;
+            font-size: 1rem; color: #555; margin: 0;
         }
         #loaderText.error {
             color: #e94560; font-size: 0.9rem;
             max-width: 340px; text-align: center; line-height: 1.5;
         }
 
-        /* Print */
+        /* Print — fit everything on one A4 page */
         @media print {
+            @page { size: A4 portrait; margin: 8mm; }
             body { background: #fff; padding: 0; }
-            .page-header, .control-panel, .btn-row, .page-footer { display: none !important; }
+            .page-header, .control-panel, .btn-row, .page-footer, .watermark { display: none !important; }
             .page-body { padding: 0; max-width: 100%; }
-            .marksheet { border: 2px solid #000; box-shadow: none; }
+            .marksheet {
+                border: 2px solid #000; box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .ms-header { padding: 10px 14px 6px; }
+            .ms-header .logo { width: 44px; height: 44px; }
+            .ms-header h2 { font-size: 1rem; }
+            .ms-header h3 { font-size: 0.9rem; }
+            .ms-header p { font-size: 0.76rem; margin-top: 1px; }
+            .ms-header .exam-title { font-size: 0.82rem; margin-top: 3px; }
+            .ms-header .sheet-title { font-size: 0.95rem; }
+            .ms-info { padding: 4px 14px; font-size: 0.76rem; }
+            table.ms-table { font-size: 0.7rem; }
+            table.ms-table th { font-size: 0.66rem; padding: 3px 3px; }
+            table.ms-table td { padding: 3px 3px; }
+            table.ms-table th, table.ms-table td { border: 1px solid #000; }
+            table.ms-table { border: 2px solid #000; }
             .input-cell input {
                 border: none !important; background: transparent !important;
                 box-shadow: none !important; font-weight: bold; padding: 0; width: auto;
+                font-size: 0.72rem;
             }
-            table.ms-table th, table.ms-table td { border: 1px solid #000; }
-            table.ms-table { border: 2px solid #000; }
+            .ms-footer { padding: 6px 14px; font-size: 0.76rem; }
             .ms-footer .right b { font-weight: bold; }
+            .ms-bottom { padding: 3px 14px 6px; font-size: 0.68rem; }
             .remark-cell { display: none; }
+            th[style*="min-width:90px"] { display: none; }
         }
 
         @media (max-width: 700px) {
@@ -834,18 +861,38 @@
                 span.style.fontWeight = 'bold';
                 inp.parentNode.replaceChild(span, inp);
             });
-            // Remove remark column
-            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.style.display = 'none'; });
-            clone.querySelectorAll('th:last-child').forEach(function(el) {
-                if (el.textContent.trim() === 'Remarks') el.style.display = 'none';
+            // Remove remark column (same as print)
+            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.remove(); });
+            var allRows = clone.querySelectorAll('tr');
+            allRows.forEach(function(row) {
+                var ths = row.querySelectorAll('th');
+                ths.forEach(function(th) {
+                    if (th.textContent.trim() === 'Remarks') th.remove();
+                });
             });
 
+            // Shrink to fit A4 single page — match print sizing
+            clone.style.fontSize = '0.7rem';
+            clone.style.border = '2px solid #000';
+            clone.style.boxShadow = 'none';
+            var header = clone.querySelector('.ms-header');
+            if (header) { header.style.padding = '10px 14px 6px'; }
+            var logo = clone.querySelector('.logo');
+            if (logo) { logo.style.width = '44px'; logo.style.height = '44px'; }
+            var tbl = clone.querySelector('.ms-table');
+            if (tbl) { tbl.style.fontSize = '0.7rem'; }
+            var footer = clone.querySelector('.ms-footer');
+            if (footer) { footer.style.padding = '6px 14px'; footer.style.fontSize = '0.76rem'; }
+            var bottom = clone.querySelector('.ms-bottom');
+            if (bottom) { bottom.style.padding = '3px 14px 6px'; bottom.style.fontSize = '0.68rem'; }
+
             var opt = {
-                margin: [6, 3, 6, 3],
+                margin: [8, 3, 8, 3],
                 filename: 'IOE-Marksheet.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2.5, useCORS: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: 'avoid-all' }
             };
 
             html2pdf().set(opt).from(clone).save();
