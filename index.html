@@ -477,7 +477,9 @@
             // Theory row
             if (r.theory_load > 0) {
                 var asstFM, finalFM;
-                if (r.credit >= 3) {
+                if (/engineering\s*workshop/i.test(r.name)) {
+                    asstFM = 20; finalFM = 0;
+                } else if (r.credit >= 3) {
                     asstFM = 40; finalFM = 60;
                 } else if (r.credit === 2) {
                     asstFM = 20; finalFM = 30;
@@ -501,6 +503,8 @@
                 var prFM = r.practical_load >= 3 ? 50 : 25;
                 // Chemistry practicals are 25 FM despite practical_load=3
                 if (/chemistry/i.test(r.name) && r.practical_load <= 3) prFM = 25;
+                // Engineering Workshop practical is 30 FM
+                if (/engineering\s*workshop/i.test(r.name)) prFM = 30;
                 rows.push({
                     code: r.code,
                     title: r.theory_load > 0 ? cleanName + ' (Practical)' : cleanName,
