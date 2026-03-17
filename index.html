@@ -221,6 +221,9 @@
         }
         .page-footer a { color: #64748b; text-decoration: none; }
         .page-footer a:hover { color: #2563eb; text-decoration: underline; }
+        .view-counter {
+            font-size: 0.65rem; color: #b0b0b0; margin-top: 4px;
+        }
 
         /* ---- Loader overlay ---- */
         #loader {
@@ -415,6 +418,7 @@
     <!-- Page Footer -->
     <div class="page-footer" id="pageFooter" style="display:none;">
         GPA shown may vary &plusmn;0.03 from the actual marksheet
+        <div class="view-counter" id="viewCounter"></div>
     </div>
 
     </div><!-- /page-wrap -->
@@ -1048,6 +1052,18 @@
         // Date
         document.getElementById('footerDate').textContent = new Date()
             .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+
+        // View counter
+        (function() {
+            fetch('https://api.countapi.xyz/hit/ioe.bibeksubedi0001.com.np/views')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d && d.value) {
+                        document.getElementById('viewCounter').textContent = d.value.toLocaleString() + ' views';
+                    }
+                })
+                .catch(function() {});
+        })();
 
         // Init
         init();
