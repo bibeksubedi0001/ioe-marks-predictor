@@ -306,7 +306,10 @@
             <img class="brand-icon" src="assets/logo.svg" alt="TU" onerror="this.style.display='none'">
             <h1>IOE Internal Marks Predictor</h1>
         </div>
-        <a class="nav-link" href="https://bibeksubedi0001.com.np" target="_blank">by Bibek Subedi</a>
+        <div style="display:flex;align-items:center;gap:14px;">
+            <span id="navViewCount" style="font-size:0.68rem;color:#64748b;"></span>
+            <a class="nav-link" href="https://bibeksubedi0001.com.np" target="_blank">by Bibek Subedi</a>
+        </div>
     </nav>
 
     <div class="page-wrap">
@@ -1059,7 +1062,9 @@
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
                     if (d && d.value) {
-                        document.getElementById('viewCounter').textContent = d.value.toLocaleString() + ' views';
+                        var txt = d.value.toLocaleString() + ' views';
+                        document.getElementById('navViewCount').textContent = txt;
+                        document.getElementById('viewCounter').textContent = txt;
                     }
                 })
                 .catch(function() {});
