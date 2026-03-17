@@ -1058,11 +1058,11 @@
 
         // View counter
         (function() {
-            fetch('https://api.countapi.xyz/hit/ioe.bibeksubedi0001.com.np/views')
+            fetch('https://api.counterapi.dev/v1/ioe-bibeksubedi0001/visits/up')
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
-                    if (d && d.value) {
-                        var txt = d.value.toLocaleString() + ' views';
+                    if (d && d.count) {
+                        var txt = d.count.toLocaleString() + ' views';
                         document.getElementById('navViewCount').textContent = txt;
                         document.getElementById('viewCounter').textContent = txt;
                     }
