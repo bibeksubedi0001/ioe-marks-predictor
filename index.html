@@ -168,6 +168,11 @@
         .input-cell input::placeholder { color: #ccc; font-size: 0.72rem; }
         .input-cell input.inp-green { background: #f0fff0; }
         .input-cell input.inp-blue { background: #eef3ff; }
+        .input-cell input.inp-error {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 2px rgba(220,38,38,0.15) !important;
+            background: #fef2f2 !important;
+        }
         .na-dash { color: #aaa; }
         .grade-cell { font-weight: bold; font-size: 0.88rem; }
         .grade-cell.ng { color: #dc2626; }
@@ -692,6 +697,59 @@
             document.getElementById('examTitle').textContent = 'Regular Examination';
             clearFooter();
             buildTable();
+            restoreMarks();
+        }
+
+        /* ============================================================
+           localStorage save / restore
+        ============================================================ */
+        function getStorageKey() {
+            var fac = document.getElementById('facSelect').value;
+            var sem = document.getElementById('semSelect').value;
+            return 'ioe_marks_' + fac + '_' + sem;
+        }
+
+        function saveMarks() {
+            try {
+                var data = {};
+                currentSubjects.forEach(function(s, i) {
+                    var asstEl = document.getElementById('asst_' + i);
+                    var finalEl = document.getElementById('final_' + i);
+                    var entry = {};
+                    if (asstEl && asstEl.value !== '') entry.a = asstEl.value;
+                    if (finalEl && finalEl.value !== '') entry.f = finalEl.value;
+                    if (entry.a !== undefined || entry.f !== undefined) data[i] = entry;
+                });
+                if (Object.keys(data).length > 0) {
+                    localStorage.setItem(getStorageKey(), JSON.stringify(data));
+                } else {
+                    localStorage.removeItem(getStorageKey());
+                }
+            } catch (e) { /* localStorage unavailable */ }
+        }
+
+        function restoreMarks() {
+            try {
+                var saved = localStorage.getItem(getStorageKey());
+                if (!saved) return;
+                var data = JSON.parse(saved);
+                var anyRestored = false;
+                currentSubjects.forEach(function(s, i) {
+                    var entry = data[i];
+                    if (!entry) return;
+                    var asstEl = document.getElementById('asst_' + i);
+                    var finalEl = document.getElementById('final_' + i);
+                    if (asstEl && entry.a !== undefined) { asstEl.value = entry.a; anyRestored = true; }
+                    if (finalEl && entry.f !== undefined) { finalEl.value = entry.f; anyRestored = true; }
+                });
+                if (anyRestored) {
+                    currentSubjects.forEach(function(s, i) { compute(i); });
+                }
+            } catch (e) { /* localStorage unavailable or corrupt */ }
+        }
+
+        function clearSavedMarks() {
+            try { localStorage.removeItem(getStorageKey()); } catch (e) {}
         }
 
         /* ============================================================
@@ -747,6 +805,7 @@
             document.getElementById('modePredict').classList.toggle('active', m === 'predict');
             document.getElementById('modeReverse').classList.toggle('active', m === 'reverse');
             buildTable();
+            restoreMarks();
         }
 
         function updateName() {
@@ -815,6 +874,20 @@
             var finalEl = document.getElementById('final_' + i);
             var asstVal = parseFloat(asstEl ? asstEl.value : '');
             var finalVal = finalEl ? parseFloat(finalEl.value) : NaN;
+
+            // Validate and show error styling
+            var asstInvalid = asstEl && asstEl.value !== '' && (isNaN(asstVal) || asstVal < 0 || asstVal > s.asstFM);
+            var finalInvalid = finalEl && finalEl.value !== '' && (isNaN(finalVal) || finalVal < 0 || finalVal > s.finalFM);
+            if (asstEl) {
+                asstEl.classList.toggle('inp-error', !!asstInvalid);
+                asstEl.title = asstInvalid ? 'Value must be 0\u2013' + s.asstFM : (mode === 'predict' ? 'Marks given by teacher (out of ' + s.asstFM + ')' : 'Marksheet Asst. marks (out of ' + s.asstFM + ')');
+            }
+            if (finalEl) {
+                finalEl.classList.toggle('inp-error', !!finalInvalid);
+                finalEl.title = finalInvalid ? 'Value must be 0\u2013' + s.finalFM : (mode === 'predict' ? 'Your external score (out of ' + s.finalFM + ')' : 'Marksheet Final marks (out of ' + s.finalFM + ')');
+            }
+
+            saveMarks();
 
             totalEl.textContent = '\u2014';
             gradeEl.textContent = '\u2014';
@@ -920,7 +993,10 @@
             }
         }
 
-        function resetAll() { loadSemester(); }
+        function resetAll() {
+            clearSavedMarks();
+            loadSemester();
+        }
 
         /* ============================================================
            Final input blur/focus: show asterisk on fail
