@@ -303,7 +303,12 @@
             .control-grid { grid-template-columns: 1fr; }
             .control-name-row { flex-direction: column; }
             .ms-header { padding: 10px 8px 6px; }
-            .ms-info { padding: 6px 10px; font-size: 0.78rem; }
+            .ms-info {
+                padding: 6px 10px; font-size: 0.78rem;
+                grid-template-columns: 1fr !important;
+                text-align: center !important;
+            }
+            .ms-info div { text-align: center !important; }
             .top-nav h1 { font-size: 0.9rem; }
         }
     </style>
