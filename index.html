@@ -217,6 +217,19 @@
         .btn-reset:hover { background: #e2e8f0; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
         .btn-print { background: linear-gradient(135deg, #166534, #15803d); color: #fff; box-shadow: 0 4px 14px rgba(22,101,52,0.25); }
         .btn-print:hover { box-shadow: 0 6px 20px rgba(22,101,52,0.35); }
+        .btn-download { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,0.25); }
+        .btn-download:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.35); }
+        .btn-copy { background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: #fff; box-shadow: 0 4px 14px rgba(124,58,237,0.25); }
+        .btn-copy:hover { box-shadow: 0 6px 20px rgba(124,58,237,0.35); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: #1e293b; color: #f1f5f9; padding: 10px 22px;
+            border-radius: 8px; font-size: 0.85rem; font-family: 'Times New Roman', Times, serif;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 9999;
+            opacity: 0; transition: all 0.3s ease; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* ---- Page Footer ---- */
         .page-footer {
@@ -420,8 +433,11 @@
 
     <div class="btn-row" id="btnRow" style="display:none;">
         <button class="btn btn-reset" onclick="resetAll()">&#8634; Reset All</button>
-        <button class="btn btn-print" onclick="window.print()">&#128424; Print Marksheet</button>
+        <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
+        <button class="btn btn-download" id="btnDownload" onclick="downloadAsImage()">&#128229; Save as Image</button>
+        <button class="btn btn-copy" id="btnCopy" onclick="copyAsImage()">&#128203; Copy as Image</button>
     </div>
+    <div class="toast" id="toast"></div>
 
     <!-- Page Footer -->
     <div class="page-footer" id="pageFooter" style="display:none;">
@@ -431,6 +447,7 @@
 
     </div><!-- /page-wrap -->
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSc5rUBVBNMPqNDn8kQnWoFph7BRCGN5E9POwV6jLmABbKRGlOCgPUBOaAMBmkW1MTFqLAQ/dwQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="data/subject-data.js"></script>
     <script>
         /* ============================================================
@@ -996,6 +1013,115 @@
         function resetAll() {
             clearSavedMarks();
             loadSemester();
+        }
+
+        /* ============================================================
+           Toast notification
+        ============================================================ */
+        function showToast(msg, duration) {
+            var el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            clearTimeout(el._tid);
+            el._tid = setTimeout(function() { el.classList.remove('show'); }, duration || 2500);
+        }
+
+        /* ============================================================
+           Capture marksheet as canvas (shared helper)
+        ============================================================ */
+        function captureMarksheet() {
+            var ms = document.getElementById('marksheet');
+            // Temporarily apply print-like styles to inputs
+            var inputs = ms.querySelectorAll('.input-cell input');
+            inputs.forEach(function(inp) {
+                inp.dataset.origStyle = inp.getAttribute('style') || '';
+                inp.style.border = 'none';
+                inp.style.background = 'transparent';
+                inp.style.boxShadow = 'none';
+                inp.style.fontWeight = 'bold';
+            });
+            // Hide remark column
+            var remarkCells = ms.querySelectorAll('.remark-cell, th:last-child');
+            remarkCells.forEach(function(el) { el.dataset.origDisplay = el.style.display; el.style.display = 'none'; });
+
+            return html2canvas(ms, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(function(canvas) {
+                // Restore styles
+                inputs.forEach(function(inp) {
+                    inp.setAttribute('style', inp.dataset.origStyle);
+                    delete inp.dataset.origStyle;
+                });
+                remarkCells.forEach(function(el) {
+                    el.style.display = el.dataset.origDisplay || '';
+                    delete el.dataset.origDisplay;
+                });
+                return canvas;
+            }).catch(function(err) {
+                inputs.forEach(function(inp) {
+                    inp.setAttribute('style', inp.dataset.origStyle || '');
+                });
+                remarkCells.forEach(function(el) {
+                    el.style.display = el.dataset.origDisplay || '';
+                });
+                throw err;
+            });
+        }
+
+        /* ============================================================
+           Download as Image
+        ============================================================ */
+        function downloadAsImage() {
+            var btn = document.getElementById('btnDownload');
+            btn.disabled = true;
+            btn.innerHTML = '&#8987; Saving\u2026';
+            captureMarksheet().then(function(canvas) {
+                var link = document.createElement('a');
+                var fac = document.getElementById('facSelect').value;
+                var sem = document.getElementById('semSelect').value;
+                link.download = 'marksheet_' + fac + '_' + sem + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('Image saved!');
+            }).catch(function() {
+                showToast('Failed to capture. Try Print instead.');
+            }).finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = '&#128229; Save as Image';
+            });
+        }
+
+        /* ============================================================
+           Copy as Image
+        ============================================================ */
+        function copyAsImage() {
+            var btn = document.getElementById('btnCopy');
+            btn.disabled = true;
+            btn.innerHTML = '&#8987; Copying\u2026';
+            captureMarksheet().then(function(canvas) {
+                return new Promise(function(resolve, reject) {
+                    canvas.toBlob(function(blob) {
+                        if (!blob) return reject(new Error('No blob'));
+                        if (navigator.clipboard && navigator.clipboard.write) {
+                            navigator.clipboard.write([
+                                new ClipboardItem({ 'image/png': blob })
+                            ]).then(resolve).catch(reject);
+                        } else {
+                            reject(new Error('Clipboard API not supported'));
+                        }
+                    }, 'image/png');
+                });
+            }).then(function() {
+                showToast('Copied to clipboard!');
+            }).catch(function() {
+                showToast('Copy failed \u2014 try Save as Image instead.');
+            }).finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = '&#128203; Copy as Image';
+            });
         }
 
         /* ============================================================
