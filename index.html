@@ -1055,32 +1055,33 @@
             var clone = ms.cloneNode(true);
             clone.style.cssText = 'border:1px solid #555;box-shadow:none;max-width:100%;width:100%;';
 
-            // Apply print styles to clone inputs
+            // Apply print styles to clone inputs and replace empty ones with dash text
             var cloneInputs = clone.querySelectorAll('.input-cell input');
-            cloneInputs.forEach(function(inp) {
-                inp.style.border = 'none';
-                inp.style.background = 'transparent';
-                inp.style.boxShadow = 'none';
-                inp.style.fontWeight = 'bold';
-                inp.style.padding = '0';
-                inp.style.width = 'auto';
-                inp.style.minWidth = '0';
-                inp.style.maxWidth = '52px';
-            });
-
-            // Copy input values from original to clone
             var origInputs = ms.querySelectorAll('.input-cell input');
+
+            // Copy values first
             origInputs.forEach(function(orig, idx) {
                 if (cloneInputs[idx]) cloneInputs[idx].value = orig.value;
             });
 
-            // Hide remark cells and their header
-            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.style.display = 'none'; });
-            // Hide last th in each header row (Remarks column)
-            clone.querySelectorAll('thead tr').forEach(function(tr) {
-                var ths = tr.querySelectorAll('th');
-                if (ths.length > 0) ths[ths.length - 1].style.display = 'none';
+            // Replace inputs: show value as plain text, or — if empty
+            cloneInputs.forEach(function(inp) {
+                var val = inp.value.trim();
+                var span = document.createElement('span');
+                span.style.cssText = 'font-weight:bold;font-size:0.85rem;font-family:Times New Roman,serif;';
+                span.textContent = val || '\u2014';
+                inp.parentNode.replaceChild(span, inp);
             });
+
+            // Remove Remarks column entirely from clone
+            // First header row: Remarks th is the last th with rowspan=2
+            var firstRow = clone.querySelector('thead tr:first-child');
+            if (firstRow) {
+                var ths = firstRow.querySelectorAll('th');
+                if (ths.length > 0) ths[ths.length - 1].remove();
+            }
+            // Remove remark td cells from each body row
+            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.remove(); });
 
             // Make table borders darker for print look
             clone.querySelectorAll('th, td').forEach(function(el) { el.style.borderColor = '#555'; });
