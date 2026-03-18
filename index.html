@@ -113,7 +113,6 @@
             border-top: 1px solid #f1f0ed;
         }
         .control-name-row .control-group { flex: 1; }
-        .control-name-row .control-group:last-child { flex: 0 0 auto; }
 
         /* ---- Marksheet ---- */
         .marksheet {
@@ -356,7 +355,7 @@
             </div>
             <div class="control-group">
                 <label>Symbol No.</label>
-                <input type="text" id="symbolNo" placeholder="e.g. 80970" oninput="updateSymbol()" style="max-width:160px;">
+                <input type="text" id="symbolNo" placeholder="e.g. 80970" oninput="updateSymbol()">
             </div>
         </div>
     </div>
@@ -373,13 +372,13 @@
             <p class="sheet-title">GRADE SHEET</p>
         </div>
 
-        <div class="ms-info" style="display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;">
+        <div class="ms-info" style="display:grid;grid-template-columns:1fr auto;gap:2px 20px;">
             <div>Name: <b id="infoName">___________________________</b></div>
-            <div style="text-align:right;">Symbol No.: <b id="infoSymbol">_______________</b></div>
+            <div style="text-align:left;">Symbol No.: <b id="infoSymbol">_______________</b></div>
             <div>Level: <b>Bachelor in Engineering</b></div>
-            <div style="text-align:right;">Programme: <b id="infoProgramme">Civil Engineering</b></div>
+            <div style="text-align:left;">Programme: <b id="infoProgramme">Civil Engineering</b></div>
             <div>Campus: <b>Pulchowk Campus</b></div>
-            <div style="text-align:right;">Year/Part: <b id="infoYearPart">I/I</b></div>
+            <div style="text-align:left;">Year/Part: <b id="infoYearPart">I/I</b></div>
         </div>
 
         <div class="ms-table-wrap">
