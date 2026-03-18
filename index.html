@@ -447,7 +447,7 @@
 
     </div><!-- /page-wrap -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSc5rUBVBNMPqNDn8kQnWoFph7BRCGN5E9POwV6jLmABbKRGlOCgPUBOaAMBmkW1MTFqLAQ/dwQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="data/subject-data.js"></script>
     <script>
         /* ============================================================
@@ -1029,9 +1029,22 @@
         /* ============================================================
            Capture marksheet as canvas (shared helper)
         ============================================================ */
+        function restoreCapture(inputs, remarkCells) {
+            inputs.forEach(function(inp) {
+                inp.setAttribute('style', inp.dataset.origStyle || '');
+                delete inp.dataset.origStyle;
+            });
+            remarkCells.forEach(function(el) {
+                el.style.display = el.dataset.origDisplay || '';
+                delete el.dataset.origDisplay;
+            });
+        }
+
         function captureMarksheet() {
+            if (typeof html2canvas !== 'function') {
+                return Promise.reject(new Error('html2canvas not loaded'));
+            }
             var ms = document.getElementById('marksheet');
-            // Temporarily apply print-like styles to inputs
             var inputs = ms.querySelectorAll('.input-cell input');
             inputs.forEach(function(inp) {
                 inp.dataset.origStyle = inp.getAttribute('style') || '';
@@ -1040,35 +1053,26 @@
                 inp.style.boxShadow = 'none';
                 inp.style.fontWeight = 'bold';
             });
-            // Hide remark column
             var remarkCells = ms.querySelectorAll('.remark-cell, th:last-child');
             remarkCells.forEach(function(el) { el.dataset.origDisplay = el.style.display; el.style.display = 'none'; });
 
-            return html2canvas(ms, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                logging: false
-            }).then(function(canvas) {
-                // Restore styles
-                inputs.forEach(function(inp) {
-                    inp.setAttribute('style', inp.dataset.origStyle);
-                    delete inp.dataset.origStyle;
+            try {
+                return html2canvas(ms, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                }).then(function(canvas) {
+                    restoreCapture(inputs, remarkCells);
+                    return canvas;
+                }, function(err) {
+                    restoreCapture(inputs, remarkCells);
+                    throw err;
                 });
-                remarkCells.forEach(function(el) {
-                    el.style.display = el.dataset.origDisplay || '';
-                    delete el.dataset.origDisplay;
-                });
-                return canvas;
-            }).catch(function(err) {
-                inputs.forEach(function(inp) {
-                    inp.setAttribute('style', inp.dataset.origStyle || '');
-                });
-                remarkCells.forEach(function(el) {
-                    el.style.display = el.dataset.origDisplay || '';
-                });
-                throw err;
-            });
+            } catch (e) {
+                restoreCapture(inputs, remarkCells);
+                return Promise.reject(e);
+            }
         }
 
         /* ============================================================
@@ -1078,6 +1082,9 @@
             var btn = document.getElementById('btnDownload');
             btn.disabled = true;
             btn.innerHTML = '&#8987; Saving\u2026';
+
+            function done() { btn.disabled = false; btn.innerHTML = '&#128229; Save as Image'; }
+
             captureMarksheet().then(function(canvas) {
                 var link = document.createElement('a');
                 var fac = document.getElementById('facSelect').value;
@@ -1086,11 +1093,10 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 showToast('Image saved!');
-            }).catch(function() {
+                done();
+            }, function() {
                 showToast('Failed to capture. Try Print instead.');
-            }).finally(function() {
-                btn.disabled = false;
-                btn.innerHTML = '&#128229; Save as Image';
+                done();
             });
         }
 
@@ -1101,6 +1107,9 @@
             var btn = document.getElementById('btnCopy');
             btn.disabled = true;
             btn.innerHTML = '&#8987; Copying\u2026';
+
+            function done() { btn.disabled = false; btn.innerHTML = '&#128203; Copy as Image'; }
+
             captureMarksheet().then(function(canvas) {
                 return new Promise(function(resolve, reject) {
                     canvas.toBlob(function(blob) {
@@ -1108,7 +1117,7 @@
                         if (navigator.clipboard && navigator.clipboard.write) {
                             navigator.clipboard.write([
                                 new ClipboardItem({ 'image/png': blob })
-                            ]).then(resolve).catch(reject);
+                            ]).then(resolve, reject);
                         } else {
                             reject(new Error('Clipboard API not supported'));
                         }
@@ -1116,11 +1125,10 @@
                 });
             }).then(function() {
                 showToast('Copied to clipboard!');
-            }).catch(function() {
+                done();
+            }, function() {
                 showToast('Copy failed \u2014 try Save as Image instead.');
-            }).finally(function() {
-                btn.disabled = false;
-                btn.innerHTML = '&#128203; Copy as Image';
+                done();
             });
         }
 
