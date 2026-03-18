@@ -376,11 +376,11 @@
         <div class="ms-info">
             <div>
                 <div>Name: <b id="infoName">___________________________</b></div>
-                <div>Symbol No.: <b id="infoSymbol">_______________</b></div>
                 <div>Level: <b>Bachelor in Engineering</b></div>
                 <div>Campus: <b>Pulchowk Campus</b></div>
             </div>
             <div style="text-align:right;">
+                <div>Symbol No.: <b id="infoSymbol">_______________</b></div>
                 <div>Programme: <b id="infoProgramme">Civil Engineering</b></div>
                 <div>Year/Part: <b id="infoYearPart">I/I</b></div>
             </div>
@@ -1036,69 +1036,92 @@
         /* ============================================================
            Capture marksheet as canvas (shared helper)
         ============================================================ */
-        function restoreCapture(inputs, remarkCells) {
-            inputs.forEach(function(inp) {
-                inp.setAttribute('style', inp.dataset.origStyle || '');
-                delete inp.dataset.origStyle;
-            });
-            remarkCells.forEach(function(el) {
-                el.style.display = el.dataset.origDisplay || '';
-                delete el.dataset.origDisplay;
-            });
-        }
-
         function captureMarksheet() {
             if (typeof html2canvas !== 'function') {
                 return Promise.reject(new Error('html2canvas not loaded'));
             }
+
+            // A4 at 96 DPI: 794 x 1123 px; we render at 2x for sharpness
+            var DPI_SCALE = 2;
+            var A4_W = 794 * DPI_SCALE;   // 1588
+            var A4_H = 1123 * DPI_SCALE;  // 2246
+            var MARGIN = 60 * DPI_SCALE;  // ~0.625in margins
+
             var ms = document.getElementById('marksheet');
-            var inputs = ms.querySelectorAll('.input-cell input');
-            inputs.forEach(function(inp) {
-                inp.dataset.origStyle = inp.getAttribute('style') || '';
+
+            // Clone the marksheet into an offscreen container with print-like styles
+            var wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + (A4_W / DPI_SCALE) + 'px;background:#fff;z-index:-1;';
+            var clone = ms.cloneNode(true);
+            clone.style.cssText = 'border:1px solid #555;box-shadow:none;max-width:100%;width:100%;';
+
+            // Apply print styles to clone inputs
+            var cloneInputs = clone.querySelectorAll('.input-cell input');
+            cloneInputs.forEach(function(inp) {
                 inp.style.border = 'none';
                 inp.style.background = 'transparent';
                 inp.style.boxShadow = 'none';
                 inp.style.fontWeight = 'bold';
+                inp.style.padding = '0';
+                inp.style.width = 'auto';
+                inp.style.minWidth = '0';
+                inp.style.maxWidth = '52px';
             });
-            var remarkCells = ms.querySelectorAll('.remark-cell, th:last-child');
-            remarkCells.forEach(function(el) { el.dataset.origDisplay = el.style.display; el.style.display = 'none'; });
 
-            // Letter size: 8.5 x 11 inches at 2x scale = 1632 x 2112 px
-            var LETTER_W = 1632;
-            var LETTER_H = 2112;
+            // Copy input values from original to clone
+            var origInputs = ms.querySelectorAll('.input-cell input');
+            origInputs.forEach(function(orig, idx) {
+                if (cloneInputs[idx]) cloneInputs[idx].value = orig.value;
+            });
+
+            // Hide remark cells and their header
+            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.style.display = 'none'; });
+            // Hide last th in each header row (Remarks column)
+            clone.querySelectorAll('thead tr').forEach(function(tr) {
+                var ths = tr.querySelectorAll('th');
+                if (ths.length > 0) ths[ths.length - 1].style.display = 'none';
+            });
+
+            // Make table borders darker for print look
+            clone.querySelectorAll('th, td').forEach(function(el) { el.style.borderColor = '#555'; });
+
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
 
             try {
-                return html2canvas(ms, {
-                    scale: 2,
+                return html2canvas(clone, {
+                    scale: DPI_SCALE,
                     useCORS: true,
                     backgroundColor: '#ffffff',
-                    logging: false
+                    logging: false,
+                    width: A4_W / DPI_SCALE,
+                    windowWidth: A4_W / DPI_SCALE
                 }).then(function(canvas) {
-                    restoreCapture(inputs, remarkCells);
-                    // Compose onto a letter-sized canvas with padding
-                    var letter = document.createElement('canvas');
-                    letter.width = LETTER_W;
-                    letter.height = LETTER_H;
-                    var ctx = letter.getContext('2d');
+                    document.body.removeChild(wrapper);
+
+                    // Compose onto A4 canvas
+                    var a4 = document.createElement('canvas');
+                    a4.width = A4_W;
+                    a4.height = A4_H;
+                    var ctx = a4.getContext('2d');
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, LETTER_W, LETTER_H);
-                    // Scale content to fit within letter margins (0.75in = 144px at 2x)
-                    var margin = 144;
-                    var availW = LETTER_W - margin * 2;
-                    var availH = LETTER_H - margin * 2;
+                    ctx.fillRect(0, 0, A4_W, A4_H);
+
+                    var availW = A4_W - MARGIN * 2;
+                    var availH = A4_H - MARGIN * 2;
                     var scale = Math.min(availW / canvas.width, availH / canvas.height, 1);
                     var drawW = canvas.width * scale;
                     var drawH = canvas.height * scale;
-                    var x = (LETTER_W - drawW) / 2;
-                    var y = margin;
+                    var x = (A4_W - drawW) / 2;
+                    var y = MARGIN;
                     ctx.drawImage(canvas, x, y, drawW, drawH);
-                    return letter;
+                    return a4;
                 }, function(err) {
-                    restoreCapture(inputs, remarkCells);
+                    document.body.removeChild(wrapper);
                     throw err;
                 });
             } catch (e) {
-                restoreCapture(inputs, remarkCells);
+                document.body.removeChild(wrapper);
                 return Promise.reject(e);
             }
         }
