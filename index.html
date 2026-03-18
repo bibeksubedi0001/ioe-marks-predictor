@@ -1043,64 +1043,75 @@
 
             // A4 at 96 DPI: 794 x 1123 px; we render at 2x for sharpness
             var DPI_SCALE = 2;
-            var A4_W = 794 * DPI_SCALE;   // 1588
-            var A4_H = 1123 * DPI_SCALE;  // 2246
-            var MARGIN = 60 * DPI_SCALE;  // ~0.625in margins
+            var A4_W = 794 * DPI_SCALE;
+            var A4_H = 1123 * DPI_SCALE;
+            var MARGIN = 60 * DPI_SCALE;
+            var PAGE_W = A4_W / DPI_SCALE; // 794px
 
             var ms = document.getElementById('marksheet');
 
-            // Clone the marksheet into an offscreen container with print-like styles
+            // Build an offscreen wrapper with its own print-like styles
             var wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + (A4_W / DPI_SCALE) + 'px;background:#fff;z-index:-1;';
+            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + PAGE_W + 'px;background:#fff;z-index:-1;font-family:Times New Roman,Times,serif;';
+
+            // Inject print-like styles scoped to wrapper
+            var style = document.createElement('style');
+            style.textContent =
+                '#captureWrap .marksheet { border:1px solid #555;box-shadow:none;max-width:100%;width:100%; }' +
+                '#captureWrap .ms-table th, #captureWrap .ms-table td { border:1px solid #555; }' +
+                '#captureWrap .remark-cell { display:none; }' +
+                '#captureWrap .capture-val { font-weight:bold;font-size:0.85rem;font-family:Times New Roman,serif;display:inline-block;text-align:center;min-width:20px; }' +
+                '#captureWrap .watermark { display:block!important;text-align:center;font-size:0.65rem;color:#ccc;margin-top:16px;font-family:Times New Roman,Times,serif; }';
+            wrapper.id = 'captureWrap';
+            wrapper.appendChild(style);
+
+            // Clone marksheet
             var clone = ms.cloneNode(true);
-            clone.style.cssText = 'border:1px solid #555;box-shadow:none;max-width:100%;width:100%;';
+            clone.removeAttribute('id');
 
-            // Apply print styles to clone inputs and replace empty ones with dash text
-            var cloneInputs = clone.querySelectorAll('.input-cell input');
+            // Get original input values before manipulating clone
             var origInputs = ms.querySelectorAll('.input-cell input');
+            var values = [];
+            origInputs.forEach(function(inp) { values.push(inp.value); });
 
-            // Copy values first
-            origInputs.forEach(function(orig, idx) {
-                if (cloneInputs[idx]) cloneInputs[idx].value = orig.value;
-            });
-
-            // Replace inputs: show value as plain text, or — if empty
-            cloneInputs.forEach(function(inp) {
-                var val = inp.value.trim();
+            // Replace every input in clone with a plain text span
+            var cloneInputs = clone.querySelectorAll('.input-cell input');
+            for (var i = cloneInputs.length - 1; i >= 0; i--) {
+                var inp = cloneInputs[i];
+                var val = (values[i] || '').trim();
+                var td = inp.parentNode;
                 var span = document.createElement('span');
-                span.style.cssText = 'font-weight:bold;font-size:0.85rem;font-family:Times New Roman,serif;';
+                span.className = 'capture-val';
                 span.textContent = val || '\u2014';
-                inp.parentNode.replaceChild(span, inp);
-            });
-
-            // Remove Remarks column entirely from clone
-            // First header row: Remarks th is the last th with rowspan=2
-            var firstRow = clone.querySelector('thead tr:first-child');
-            if (firstRow) {
-                var ths = firstRow.querySelectorAll('th');
-                if (ths.length > 0) ths[ths.length - 1].remove();
+                td.innerHTML = '';
+                td.appendChild(span);
             }
-            // Remove remark td cells from each body row
-            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.remove(); });
 
-            // Make table borders darker for print look
-            clone.querySelectorAll('th, td').forEach(function(el) { el.style.borderColor = '#555'; });
+            // Clear remark cell contents (CSS hides them, but clear for safety)
+            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.textContent = ''; });
 
             wrapper.appendChild(clone);
+
+            // Add watermark
+            var wm = document.createElement('div');
+            wm.className = 'watermark';
+            wm.textContent = 'Sample By: Bibek Subedi';
+            wrapper.appendChild(wm);
+
             document.body.appendChild(wrapper);
 
             try {
-                return html2canvas(clone, {
+                return html2canvas(wrapper, {
                     scale: DPI_SCALE,
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     logging: false,
-                    width: A4_W / DPI_SCALE,
-                    windowWidth: A4_W / DPI_SCALE
+                    width: PAGE_W,
+                    windowWidth: PAGE_W
                 }).then(function(canvas) {
                     document.body.removeChild(wrapper);
 
-                    // Compose onto A4 canvas
+                    // Compose onto A4 canvas with margins
                     var a4 = document.createElement('canvas');
                     a4.width = A4_W;
                     a4.height = A4_H;
