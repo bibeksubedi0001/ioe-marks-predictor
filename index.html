@@ -1041,49 +1041,118 @@
                 return Promise.reject(new Error('html2canvas not loaded'));
             }
 
-            // A4 at 96 DPI: 794 x 1123 px; we render at 2x for sharpness
+            // A4 at 96 DPI: 794 x 1123 px; render at 2x for sharpness
             var DPI_SCALE = 2;
-            var A4_W = 794 * DPI_SCALE;   // 1588
-            var A4_H = 1123 * DPI_SCALE;  // 2246
-            var MARGIN = 60 * DPI_SCALE;  // ~0.625in margins
+            var A4_W = 794 * DPI_SCALE;
+            var A4_H = 1123 * DPI_SCALE;
+            var MARGIN = 60 * DPI_SCALE;
+            var contentW = A4_W / DPI_SCALE;  // 794px
 
             var ms = document.getElementById('marksheet');
 
-            // Clone the marksheet into an offscreen container with print-like styles
+            // ---- Build print-corrected values (same logic as beforeprint) ----
+            var printVals = [];
+            currentSubjects.forEach(function(s, i) {
+                var asstEl = document.getElementById('asst_' + i);
+                var finalEl = document.getElementById('final_' + i);
+                var totalEl = document.getElementById('total_' + i);
+                var gradeEl = document.getElementById('grade_' + i);
+                var hasFinal = !s.practical && s.finalFM > 0;
+
+                var entry = {
+                    asst: asstEl ? asstEl.value : '',
+                    final: finalEl ? finalEl.value : '',
+                    total: totalEl ? totalEl.textContent : '\u2014',
+                    grade: gradeEl ? gradeEl.textContent : '\u2014'
+                };
+
+                var asstVal = parseFloat(entry.asst);
+                var finalVal = parseFloat(entry.final);
+
+                if (!isNaN(asstVal) && hasFinal && !isNaN(finalVal) &&
+                    asstVal >= 0 && asstVal <= s.asstFM && finalVal >= 0 && finalVal <= s.finalFM) {
+
+                    if (s.passFinal > 0 && finalVal < s.passFinal) {
+                        entry.asst = 'NU';
+                        entry.final = Math.round(finalVal) + '*';
+                        entry.total = '\u2014';
+                        entry.grade = 'NG';
+                    } else if (mode === 'predict') {
+                        var res = forwardPredict(asstVal, finalVal, s);
+                        entry.asst = String(res.rounded);
+                    } else if (mode === 'reverse') {
+                        var msAsst = Math.round(asstVal);
+                        var maxPossible = getMaxPossibleAsst(finalVal, s);
+                        if (msAsst > maxPossible) {
+                            entry.asst = String(maxPossible);
+                            var total = maxPossible + Math.round(finalVal);
+                            var totalFM = s.asstFM + s.finalFM;
+                            var pct = (total / totalFM) * 100;
+                            var gr = getGrade(pct);
+                            entry.total = String(total);
+                            entry.grade = gr.g;
+                        }
+                    }
+                }
+                printVals.push(entry);
+            });
+
+            // ---- Clone and apply print styles ----
             var wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + (A4_W / DPI_SCALE) + 'px;background:#fff;z-index:-1;';
+            wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + contentW + 'px;background:#fff;z-index:-1;font-family:Times New Roman,Times,serif;';
             var clone = ms.cloneNode(true);
             clone.style.cssText = 'border:1px solid #555;box-shadow:none;max-width:100%;width:100%;';
 
-            // Apply print styles to clone inputs and replace empty ones with dash text
-            var cloneInputs = clone.querySelectorAll('.input-cell input');
-            var origInputs = ms.querySelectorAll('.input-cell input');
+            // Remove ALL ids from clone to avoid DOM conflicts
+            clone.querySelectorAll('[id]').forEach(function(el) { el.removeAttribute('id'); });
 
-            // Copy values first
-            origInputs.forEach(function(orig, idx) {
-                if (cloneInputs[idx]) cloneInputs[idx].value = orig.value;
-            });
-
-            // Replace inputs: show value as plain text, or — if empty
-            cloneInputs.forEach(function(inp) {
-                var val = inp.value.trim();
-                var span = document.createElement('span');
-                span.style.cssText = 'font-weight:bold;font-size:0.85rem;font-family:Times New Roman,serif;';
-                span.textContent = val || '\u2014';
-                inp.parentNode.replaceChild(span, inp);
-            });
-
-            // Remove Remarks column entirely from clone
-            // First header row: Remarks th is the last th with rowspan=2
-            var firstRow = clone.querySelector('thead tr:first-child');
-            if (firstRow) {
-                var ths = firstRow.querySelectorAll('th');
+            // ---- Remove Remarks column ----
+            // Header: last th in first row (rowspan=2)
+            var headerRows = clone.querySelectorAll('thead tr');
+            if (headerRows[0]) {
+                var ths = headerRows[0].querySelectorAll('th');
                 if (ths.length > 0) ths[ths.length - 1].remove();
             }
-            // Remove remark td cells from each body row
-            clone.querySelectorAll('.remark-cell').forEach(function(el) { el.remove(); });
+            // Body: remove last td (remark-cell) from each row
+            clone.querySelectorAll('tbody tr').forEach(function(tr) {
+                var cells = tr.querySelectorAll('td');
+                if (cells.length > 0) cells[cells.length - 1].remove();
+            });
 
-            // Make table borders darker for print look
+            // ---- Replace inputs with plain text spans ----
+            var rows = clone.querySelectorAll('tbody tr');
+            rows.forEach(function(tr, i) {
+                var entry = printVals[i];
+                if (!entry) return;
+                var inputCells = tr.querySelectorAll('.input-cell');
+                inputCells.forEach(function(cell, ci) {
+                    // ci=0 is Asst, ci=1 is Final
+                    var val = ci === 0 ? entry.asst : entry.final;
+                    // Clear cell content
+                    cell.innerHTML = '';
+                    cell.classList.remove('input-cell');
+                    var span = document.createElement('span');
+                    span.style.cssText = 'font-weight:bold;font-size:0.85rem;';
+                    span.textContent = (val && val.trim()) ? val.trim() : '\u2014';
+                    cell.appendChild(span);
+                });
+            });
+
+            // ---- Replace total & grade text cells with corrected values ----
+            rows.forEach(function(tr, i) {
+                var entry = printVals[i];
+                if (!entry) return;
+                var cells = tr.querySelectorAll('td');
+                // After removing remark, cells: 0=code, 1=title, 2=asstFM, 3=finalFM, 4=passAsst, 5=passFinal, 6=asst, 7=final, 8=total, 9=grade
+                if (cells[8]) cells[8].textContent = entry.total;
+                if (cells[9]) {
+                    cells[9].textContent = entry.grade;
+                    cells[9].style.fontWeight = 'bold';
+                    if (entry.grade === 'NG') cells[9].style.color = '#dc2626';
+                }
+            });
+
+            // Darken table borders
             clone.querySelectorAll('th, td').forEach(function(el) { el.style.borderColor = '#555'; });
 
             wrapper.appendChild(clone);
@@ -1095,26 +1164,25 @@
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     logging: false,
-                    width: A4_W / DPI_SCALE,
-                    windowWidth: A4_W / DPI_SCALE
+                    width: contentW,
+                    windowWidth: contentW
                 }).then(function(canvas) {
                     document.body.removeChild(wrapper);
-
-                    // Compose onto A4 canvas
+                    // Compose onto A4 canvas — gradesheet should cover ~80% of page
                     var a4 = document.createElement('canvas');
                     a4.width = A4_W;
                     a4.height = A4_H;
                     var ctx = a4.getContext('2d');
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, A4_W, A4_H);
-
-                    var availW = A4_W - MARGIN * 2;
-                    var availH = A4_H - MARGIN * 2;
-                    var scale = Math.min(availW / canvas.width, availH / canvas.height, 1);
+                    // Target: 80% of page width for content
+                    var targetW = A4_W * 0.80;
+                    var targetH = A4_H * 0.80;
+                    var scale = Math.min(targetW / canvas.width, targetH / canvas.height);
                     var drawW = canvas.width * scale;
                     var drawH = canvas.height * scale;
                     var x = (A4_W - drawW) / 2;
-                    var y = MARGIN;
+                    var y = (A4_H - drawH) / 2;
                     ctx.drawImage(canvas, x, y, drawW, drawH);
                     return a4;
                 }, function(err) {
