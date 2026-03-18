@@ -219,8 +219,6 @@
         .btn-print:hover { box-shadow: 0 6px 20px rgba(22,101,52,0.35); }
         .btn-download { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,0.25); }
         .btn-download:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.35); }
-        .btn-copy { background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: #fff; box-shadow: 0 4px 14px rgba(124,58,237,0.25); }
-        .btn-copy:hover { box-shadow: 0 6px 20px rgba(124,58,237,0.35); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
         .toast {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
@@ -346,8 +344,8 @@
             <div class="control-group">
                 <label>Mode</label>
                 <div class="mode-toggle">
-                    <button id="modePredict" class="active" onclick="setMode('predict')">&#9654; Predict</button>
-                    <button id="modeReverse" onclick="setMode('reverse')">&#9664; Reverse</button>
+                    <button id="modePredict" class="active" onclick="setMode('predict')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align:-1px;"><path d="M2 1l8 5-8 5V1z" fill="currentColor"/></svg> Predict</button>
+                    <button id="modeReverse" onclick="setMode('reverse')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align:-1px;"><path d="M10 1l-8 5 8 5V1z" fill="currentColor"/></svg> Reverse</button>
                 </div>
             </div>
         </div>
@@ -355,6 +353,10 @@
             <div class="control-group">
                 <label>Student Name</label>
                 <input type="text" id="studentName" placeholder="Enter your full name" oninput="updateName()">
+            </div>
+            <div class="control-group">
+                <label>Symbol No.</label>
+                <input type="text" id="symbolNo" placeholder="e.g. 80970" oninput="updateSymbol()" style="max-width:160px;">
             </div>
         </div>
     </div>
@@ -374,6 +376,7 @@
         <div class="ms-info">
             <div>
                 <div>Name: <b id="infoName">___________________________</b></div>
+                <div>Symbol No.: <b id="infoSymbol">_______________</b></div>
                 <div>Level: <b>Bachelor in Engineering</b></div>
                 <div>Campus: <b>Pulchowk Campus</b></div>
             </div>
@@ -432,10 +435,9 @@
     <div class="watermark">Sample By: Bibek Subedi</div>
 
     <div class="btn-row" id="btnRow" style="display:none;">
-        <button class="btn btn-reset" onclick="resetAll()">&#8634; Reset All</button>
-        <button class="btn btn-print" onclick="window.print()">&#128424; Print</button>
-        <button class="btn btn-download" id="btnDownload" onclick="downloadAsImage()">&#128229; Save as Image</button>
-        <button class="btn btn-copy" id="btnCopy" onclick="copyAsImage()">&#128203; Copy as Image</button>
+        <button class="btn btn-reset" onclick="resetAll()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Reset All</button>
+        <button class="btn btn-print" onclick="window.print()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Print</button>
+        <button class="btn btn-download" id="btnDownload" onclick="downloadAsImage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save as Image</button>
     </div>
     <div class="toast" id="toast"></div>
 
@@ -830,6 +832,11 @@
             document.getElementById('infoName').textContent = name || '___________________________';
         }
 
+        function updateSymbol() {
+            var sym = document.getElementById('symbolNo').value.trim();
+            document.getElementById('infoSymbol').textContent = sym || '_______________';
+        }
+
         function clearFooter() {
             document.getElementById('footerGrade').textContent = '\u2014';
             document.getElementById('footerGPA').textContent = '\u2014';
@@ -1056,6 +1063,10 @@
             var remarkCells = ms.querySelectorAll('.remark-cell, th:last-child');
             remarkCells.forEach(function(el) { el.dataset.origDisplay = el.style.display; el.style.display = 'none'; });
 
+            // Letter size: 8.5 x 11 inches at 2x scale = 1632 x 2112 px
+            var LETTER_W = 1632;
+            var LETTER_H = 2112;
+
             try {
                 return html2canvas(ms, {
                     scale: 2,
@@ -1064,7 +1075,24 @@
                     logging: false
                 }).then(function(canvas) {
                     restoreCapture(inputs, remarkCells);
-                    return canvas;
+                    // Compose onto a letter-sized canvas with padding
+                    var letter = document.createElement('canvas');
+                    letter.width = LETTER_W;
+                    letter.height = LETTER_H;
+                    var ctx = letter.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, LETTER_W, LETTER_H);
+                    // Scale content to fit within letter margins (0.75in = 144px at 2x)
+                    var margin = 144;
+                    var availW = LETTER_W - margin * 2;
+                    var availH = LETTER_H - margin * 2;
+                    var scale = Math.min(availW / canvas.width, availH / canvas.height, 1);
+                    var drawW = canvas.width * scale;
+                    var drawH = canvas.height * scale;
+                    var x = (LETTER_W - drawW) / 2;
+                    var y = margin;
+                    ctx.drawImage(canvas, x, y, drawW, drawH);
+                    return letter;
                 }, function(err) {
                     restoreCapture(inputs, remarkCells);
                     throw err;
@@ -1080,10 +1108,11 @@
         ============================================================ */
         function downloadAsImage() {
             var btn = document.getElementById('btnDownload');
+            var svgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
             btn.disabled = true;
-            btn.innerHTML = '&#8987; Saving\u2026';
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;animation:spin 0.75s linear infinite;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Saving\u2026';
 
-            function done() { btn.disabled = false; btn.innerHTML = '&#128229; Save as Image'; }
+            function done() { btn.disabled = false; btn.innerHTML = svgIcon + ' Save as Image'; }
 
             captureMarksheet().then(function(canvas) {
                 var link = document.createElement('a');
@@ -1096,38 +1125,6 @@
                 done();
             }, function() {
                 showToast('Failed to capture. Try Print instead.');
-                done();
-            });
-        }
-
-        /* ============================================================
-           Copy as Image
-        ============================================================ */
-        function copyAsImage() {
-            var btn = document.getElementById('btnCopy');
-            btn.disabled = true;
-            btn.innerHTML = '&#8987; Copying\u2026';
-
-            function done() { btn.disabled = false; btn.innerHTML = '&#128203; Copy as Image'; }
-
-            captureMarksheet().then(function(canvas) {
-                return new Promise(function(resolve, reject) {
-                    canvas.toBlob(function(blob) {
-                        if (!blob) return reject(new Error('No blob'));
-                        if (navigator.clipboard && navigator.clipboard.write) {
-                            navigator.clipboard.write([
-                                new ClipboardItem({ 'image/png': blob })
-                            ]).then(resolve, reject);
-                        } else {
-                            reject(new Error('Clipboard API not supported'));
-                        }
-                    }, 'image/png');
-                });
-            }).then(function() {
-                showToast('Copied to clipboard!');
-                done();
-            }, function() {
-                showToast('Copy failed \u2014 try Save as Image instead.');
                 done();
             });
         }
