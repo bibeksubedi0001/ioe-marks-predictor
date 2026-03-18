@@ -1168,21 +1168,27 @@
                     windowWidth: contentW
                 }).then(function(canvas) {
                     document.body.removeChild(wrapper);
-                    // Compose onto A4 canvas — gradesheet should cover ~80% of page
+                    // Compose onto A4 — fill page width with small margins, top-aligned
                     var a4 = document.createElement('canvas');
                     a4.width = A4_W;
                     a4.height = A4_H;
                     var ctx = a4.getContext('2d');
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, A4_W, A4_H);
-                    // Target: 80% of page width for content
-                    var targetW = A4_W * 0.80;
-                    var targetH = A4_H * 0.80;
-                    var scale = Math.min(targetW / canvas.width, targetH / canvas.height);
-                    var drawW = canvas.width * scale;
+                    // 5% margin on each side = 90% content width; small top margin
+                    var sideMargin = Math.round(A4_W * 0.05);
+                    var topMargin = Math.round(A4_H * 0.04);
+                    var drawW = A4_W - sideMargin * 2;
+                    var scale = drawW / canvas.width;
                     var drawH = canvas.height * scale;
+                    // If it overflows page height, cap it
+                    if (drawH > A4_H - topMargin * 2) {
+                        scale = (A4_H - topMargin * 2) / canvas.height;
+                        drawH = canvas.height * scale;
+                        drawW = canvas.width * scale;
+                    }
                     var x = (A4_W - drawW) / 2;
-                    var y = (A4_H - drawH) / 2;
+                    var y = topMargin;
                     ctx.drawImage(canvas, x, y, drawW, drawH);
                     return a4;
                 }, function(err) {
