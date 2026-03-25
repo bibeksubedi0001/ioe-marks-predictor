@@ -285,7 +285,7 @@
         /* Print */
         @media print {
             body { background: #fff; padding: 0; }
-            .control-panel, .btn-row, .page-header, .page-footer, .top-nav { display: none !important; }
+            .control-panel, .btn-row, .page-header, .page-footer, .top-nav, .contact-section { display: none !important; }
             .page-wrap { padding: 0; max-width: 100%; }
             .marksheet { border: 1px solid #555; box-shadow: none; max-width: 100%; }
             .input-cell input {
@@ -308,6 +308,105 @@
         }
         .watermark { display: none; }
 
+        /* ---- Contact / Email Section ---- */
+        .contact-section {
+            margin-top: 32px;
+        }
+        .contact-heading {
+            font-size: 0.85rem; font-weight: 700;
+            color: #64748b; text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .contact-heading::before {
+            content: ''; display: inline-block;
+            width: 20px; height: 2px; background: #cbd5e1;
+        }
+        .email-compose {
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .email-titlebar {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 10px 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .email-titlebar .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .email-titlebar .dot-red { background: #ef4444; }
+        .email-titlebar .dot-yellow { background: #eab308; }
+        .email-titlebar .dot-green { background: #22c55e; }
+        .email-titlebar span {
+            margin-left: 8px; font-size: 0.78rem;
+            color: #94a3b8; font-weight: 600;
+        }
+        .email-fields {
+            padding: 0;
+        }
+        .email-field-row {
+            display: flex; align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 0 16px;
+        }
+        .email-field-row label {
+            font-size: 0.78rem; color: #94a3b8;
+            font-weight: 600; min-width: 62px;
+            padding: 10px 0;
+        }
+        .email-field-row input {
+            flex: 1; border: none; outline: none;
+            font-size: 0.88rem; padding: 10px 8px;
+            font-family: 'Times New Roman', Times, serif;
+            background: transparent; color: #1e293b;
+        }
+        .email-field-row input::placeholder { color: #cbd5e1; }
+        .email-field-row .to-address {
+            font-size: 0.85rem; color: #2563eb;
+            font-weight: 600; padding: 10px 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .email-field-row .to-chip {
+            background: #eff6ff; border: 1px solid #bfdbfe;
+            border-radius: 16px; padding: 3px 12px;
+            font-size: 0.78rem; color: #1d4ed8;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .email-body-wrap {
+            padding: 12px 16px;
+        }
+        .email-body-wrap textarea {
+            width: 100%; min-height: 120px; border: none; outline: none;
+            font-size: 0.88rem; font-family: 'Times New Roman', Times, serif;
+            resize: vertical; color: #334155;
+            line-height: 1.6; background: transparent;
+        }
+        .email-body-wrap textarea::placeholder { color: #cbd5e1; }
+        .email-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px;
+            border-top: 1px solid #f1f5f9;
+            background: #fafaf9;
+        }
+        .btn-send {
+            padding: 10px 28px; border: none; border-radius: 8px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff; font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; font-family: 'Times New Roman', Times, serif;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(37,99,235,0.25);
+        }
+        .btn-send:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 16px rgba(37,99,235,0.35);
+        }
+        .btn-send:active { transform: translateY(0); }
+        .email-toolbar .hint {
+            font-size: 0.7rem; color: #94a3b8;
+        }
+
         @media (max-width: 700px) {
             .page-wrap { padding: 14px 8px 30px; }
             .control-grid { grid-template-columns: 1fr; }
@@ -315,6 +414,7 @@
             .ms-header { padding: 10px 8px 6px; }
             .ms-info { padding: 6px 10px; font-size: 0.78rem; }
             .top-nav h1 { font-size: 0.9rem; }
+            .email-field-row label { min-width: 50px; font-size: 0.72rem; }
         }
     </style>
 </head>
@@ -445,6 +545,48 @@
         <button class="btn btn-download" id="btnDownload" onclick="downloadAsImage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save as Image</button>
     </div>
     <div class="toast" id="toast"></div>
+
+    <!-- Contact Section -->
+    <div class="contact-section" id="contactSection" style="display:none;">
+        <div class="contact-heading">Send me a message</div>
+        <div class="email-compose">
+            <div class="email-titlebar">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+                <span>New Message</span>
+            </div>
+            <div class="email-fields">
+                <div class="email-field-row">
+                    <label>To</label>
+                    <div class="to-address">
+                        <span class="to-chip">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            078bce035.bibek@pcampus.edu.np
+                        </span>
+                    </div>
+                </div>
+                <div class="email-field-row">
+                    <label>From</label>
+                    <input type="email" id="contactFrom" placeholder="your.email@example.com">
+                </div>
+                <div class="email-field-row">
+                    <label>Subject</label>
+                    <input type="text" id="contactSubject" placeholder="What's this about?">
+                </div>
+            </div>
+            <div class="email-body-wrap">
+                <textarea id="contactBody" placeholder="Write your message here..."></textarea>
+            </div>
+            <div class="email-toolbar">
+                <button class="btn-send" onclick="sendContactEmail()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Send
+                </button>
+                <span class="hint">Opens your default email client</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Page Footer -->
     <div class="page-footer" id="pageFooter" style="display:none;">
@@ -599,7 +741,7 @@
             var loader = document.getElementById('loader');
             loader.classList.add('fade-out');
             setTimeout(function() { loader.style.display = 'none'; }, 420);
-            ['topNav','controlsBar','marksheet','btnRow','pageFooter']
+            ['topNav','controlsBar','marksheet','btnRow','contactSection','pageFooter']
                 .forEach(function(id) { document.getElementById(id).style.display = ''; });
         }
 
@@ -1384,6 +1526,23 @@
                 })
                 .catch(function() {});
         })();
+
+        // Contact email handler
+        function sendContactEmail() {
+            var from = document.getElementById('contactFrom').value.trim();
+            var subject = document.getElementById('contactSubject').value.trim();
+            var body = document.getElementById('contactBody').value.trim();
+            if (!subject && !body) {
+                showToast('Please enter a subject or message');
+                return;
+            }
+            var fullBody = body;
+            if (from) fullBody += '\n\n— From: ' + from;
+            var mailto = 'mailto:078bce035.bibek@pcampus.edu.np'
+                + '?subject=' + encodeURIComponent(subject || 'Message from IOE Marks Predictor')
+                + '&body=' + encodeURIComponent(fullBody);
+            window.open(mailto, '_blank');
+        }
 
         // Init
         init();
