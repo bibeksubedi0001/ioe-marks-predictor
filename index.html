@@ -816,18 +816,21 @@
             // Practical row
             if (r.practical_load > 0) {
                 var prFM = r.practical_load >= 3 ? 50 : 25;
+                var prFinalFM = 0;
                 // Chemistry practicals are 25 FM despite practical_load=3
                 if (/chemistry/i.test(r.name) && r.practical_load <= 3) prFM = 25;
                 // Engineering Workshop practical is 30 FM
                 if (/workshop/i.test(r.name)) prFM = 30;
+                // Electrical Installation Workshop: 30 asst + 20 final
+                if (r.code === 'ENEE 152') { prFM = 30; prFinalFM = 20; }
                 rows.push({
                     code: r.code,
                     title: r.theory_load > 0 ? cleanName + ' (Practical)' : cleanName,
                     credit: r.theory_load > 0 ? 0 : r.credit,
                     asstFM: prFM,
-                    finalFM: 0,
+                    finalFM: prFinalFM,
                     passAsst: Math.round(prFM * 0.4),
-                    passFinal: 0,
+                    passFinal: Math.round(prFinalFM * 0.4),
                     practical: true
                 });
             }
