@@ -14,7 +14,6 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="IOE Internal Marks Predictor">
     <meta name="twitter:description" content="Predict your IOE internal assessment marks or reverse-calculate teacher-given marks from your published grade sheet.">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -339,12 +338,9 @@
         .email-titlebar .dot-red { background: #ef4444; }
         .email-titlebar .dot-yellow { background: #eab308; }
         .email-titlebar .dot-green { background: #22c55e; }
-        .email-titlebar .titlebar-text {
+        .email-titlebar span {
             margin-left: 8px; font-size: 0.78rem;
             color: #94a3b8; font-weight: 600;
-        }
-        .email-titlebar .titlebar-right {
-            margin-left: auto; display: flex; align-items: center; gap: 10px;
         }
         .email-fields {
             padding: 0;
@@ -377,15 +373,7 @@
             font-size: 0.78rem; color: #1d4ed8;
             display: inline-flex; align-items: center; gap: 4px;
         }
-        .email-field-row .from-chip {
-            background: #f0fdf4; border: 1px solid #bbf7d0;
-            border-radius: 16px; padding: 3px 12px;
-            font-size: 0.78rem; color: #166534;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .email-field-row .from-chip img {
-            width: 18px; height: 18px; border-radius: 50%;
-        }
+
         .email-body-wrap {
             padding: 12px 16px;
         }
@@ -416,70 +404,8 @@
             box-shadow: 0 5px 16px rgba(37,99,235,0.35);
         }
         .btn-send:active { transform: translateY(0); }
-        .btn-send:disabled {
-            opacity: 0.6; cursor: not-allowed; transform: none !important;
-        }
         .email-toolbar .hint {
             font-size: 0.7rem; color: #94a3b8;
-        }
-        /* Login prompt inside compose */
-        .login-prompt {
-            padding: 40px 20px; text-align: center;
-        }
-        .login-prompt .lock-icon {
-            width: 48px; height: 48px; margin: 0 auto 14px;
-            background: #f1f5f9; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .login-prompt .lock-icon svg { color: #64748b; }
-        .login-prompt p {
-            font-size: 0.88rem; color: #64748b; margin-bottom: 18px;
-            line-height: 1.5;
-        }
-        .login-prompt .sub {
-            font-size: 0.75rem; color: #94a3b8; margin-top: 4px;
-        }
-        .btn-google {
-            padding: 10px 24px; border: 1px solid #dadce0;
-            border-radius: 8px; background: #fff;
-            font-size: 0.88rem; font-weight: 600; cursor: pointer;
-            font-family: 'Times New Roman', Times, serif;
-            display: inline-flex; align-items: center; gap: 10px;
-            transition: all 0.2s ease; color: #3c4043;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        .btn-google:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-            background: #f8f9fa;
-        }
-        .btn-google img {
-            width: 18px; height: 18px;
-        }
-        .user-bar {
-            display: flex; align-items: center; gap: 8px;
-        }
-        .user-bar img {
-            width: 22px; height: 22px; border-radius: 50%;
-            border: 1.5px solid #475569;
-        }
-        .user-bar .user-name {
-            font-size: 0.72rem; color: #cbd5e1;
-            font-weight: 600; max-width: 120px;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .btn-signout {
-            background: none; border: 1px solid #475569;
-            color: #94a3b8; font-size: 0.65rem; padding: 3px 10px;
-            border-radius: 6px; cursor: pointer;
-            font-family: 'Times New Roman', Times, serif;
-            transition: all 0.2s;
-        }
-        .btn-signout:hover { background: rgba(255,255,255,0.05); color: #e2e8f0; }
-        .sending-spinner {
-            display: inline-block; width: 14px; height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff; border-radius: 50%;
-            animation: spin 0.6s linear infinite;
         }
 
         @media (max-width: 700px) {
@@ -629,54 +555,36 @@
                 <div class="dot dot-red"></div>
                 <div class="dot dot-yellow"></div>
                 <div class="dot dot-green"></div>
-                <span class="titlebar-text">New Message</span>
-                <div class="titlebar-right" id="titlebarUser" style="display:none;"></div>
+                <span>New Message</span>
             </div>
-
-            <!-- Login prompt (shown when not signed in) -->
-            <div id="contactLoginPrompt" class="login-prompt">
-                <div class="lock-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="email-fields">
+                <div class="email-field-row">
+                    <label>To</label>
+                    <div class="to-address">
+                        <span class="to-chip">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            078bce035.bibek@pcampus.edu.np
+                        </span>
+                    </div>
                 </div>
-                <p>Sign in with Google to send me an email<br>directly from this page</p>
-                <button class="btn-google" onclick="googleSignIn()">
-                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                    Sign in with Google
+                <div class="email-field-row">
+                    <label>From</label>
+                    <input type="email" id="contactFrom" placeholder="your.email@example.com">
+                </div>
+                <div class="email-field-row">
+                    <label>Subject</label>
+                    <input type="text" id="contactSubject" placeholder="What's this about?">
+                </div>
+            </div>
+            <div class="email-body-wrap">
+                <textarea id="contactBody" placeholder="Write your message here..."></textarea>
+            </div>
+            <div class="email-toolbar">
+                <button class="btn-send" onclick="sendContactEmail()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Send
                 </button>
-                <p class="sub">We only use your email to send this message</p>
-            </div>
-
-            <!-- Compose UI (shown after sign in) -->
-            <div id="contactCompose" style="display:none;">
-                <div class="email-fields">
-                    <div class="email-field-row">
-                        <label>To</label>
-                        <div class="to-address">
-                            <span class="to-chip">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                078bce035.bibek@pcampus.edu.np
-                            </span>
-                        </div>
-                    </div>
-                    <div class="email-field-row">
-                        <label>From</label>
-                        <div id="contactFromChip" class="from-chip"></div>
-                    </div>
-                    <div class="email-field-row">
-                        <label>Subject</label>
-                        <input type="text" id="contactSubject" placeholder="What's this about?">
-                    </div>
-                </div>
-                <div class="email-body-wrap">
-                    <textarea id="contactBody" placeholder="Write your message here..."></textarea>
-                </div>
-                <div class="email-toolbar">
-                    <button class="btn-send" id="btnSendEmail" onclick="sendContactEmail()">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                        Send
-                    </button>
-                    <span class="hint">Sends directly via your Gmail</span>
-                </div>
+                <span class="hint">Opens your default email client</span>
             </div>
         </div>
     </div>
@@ -1620,150 +1528,21 @@
                 .catch(function() {});
         })();
 
-        /* ============================================================
-           Google Sign-In & Gmail API – Contact Section
-           -------------------------------------------------------
-           SETUP REQUIRED:
-           1. Go to https://console.cloud.google.com/
-           2. Create a project (or use existing)
-           3. Enable the Gmail API
-           4. Create OAuth 2.0 Client ID (Web application)
-              - Authorized JavaScript origins: your domain
-                e.g. https://ioe.bibeksubedi0001.com.np
-              - Also add http://localhost for local testing
-           5. Replace YOUR_GOOGLE_CLIENT_ID below with the Client ID
-        ============================================================ */
-        var GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-        var gmailUser = null;  // { email, name, picture, accessToken }
-
-        function googleSignIn() {
-            var client = google.accounts.oauth2.initTokenClient({
-                client_id: GOOGLE_CLIENT_ID,
-                scope: 'https://www.googleapis.com/auth/gmail.send email profile',
-                callback: function(tokenResponse) {
-                    if (tokenResponse && tokenResponse.access_token) {
-                        // Fetch user profile info
-                        fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-                            headers: { 'Authorization': 'Bearer ' + tokenResponse.access_token }
-                        })
-                        .then(function(r) { return r.json(); })
-                        .then(function(profile) {
-                            gmailUser = {
-                                email: profile.email,
-                                name: profile.name || profile.email,
-                                picture: profile.picture || '',
-                                accessToken: tokenResponse.access_token
-                            };
-                            showComposeUI();
-                        })
-                        .catch(function() {
-                            showToast('Failed to get profile info. Try again.');
-                        });
-                    }
-                },
-                error_callback: function() {
-                    showToast('Sign-in was cancelled or failed');
-                }
-            });
-            client.requestAccessToken();
-        }
-
-        function showComposeUI() {
-            if (!gmailUser) return;
-            document.getElementById('contactLoginPrompt').style.display = 'none';
-            document.getElementById('contactCompose').style.display = '';
-
-            // From chip
-            var chipHTML = '';
-            if (gmailUser.picture) {
-                chipHTML += '<img src="' + gmailUser.picture + '" alt="">';
-            }
-            chipHTML += gmailUser.email;
-            document.getElementById('contactFromChip').innerHTML = chipHTML;
-
-            // Title bar user info
-            var titlebar = document.getElementById('titlebarUser');
-            var tbHTML = '';
-            if (gmailUser.picture) {
-                tbHTML += '<img src="' + gmailUser.picture + '" alt="" style="width:20px;height:20px;border-radius:50%;border:1.5px solid #475569;">';
-            }
-            tbHTML += '<span style="font-size:0.7rem;color:#cbd5e1;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + gmailUser.name + '</span>';
-            tbHTML += '<button class="btn-signout" onclick="googleSignOut()">Sign out</button>';
-            titlebar.innerHTML = tbHTML;
-            titlebar.style.display = 'flex';
-        }
-
-        function googleSignOut() {
-            if (gmailUser && gmailUser.accessToken) {
-                google.accounts.oauth2.revoke(gmailUser.accessToken);
-            }
-            gmailUser = null;
-            document.getElementById('contactLoginPrompt').style.display = '';
-            document.getElementById('contactCompose').style.display = 'none';
-            document.getElementById('titlebarUser').style.display = 'none';
-            document.getElementById('contactSubject').value = '';
-            document.getElementById('contactBody').value = '';
-            showToast('Signed out');
-        }
-
+        // Contact email handler
         function sendContactEmail() {
-            if (!gmailUser || !gmailUser.accessToken) {
-                showToast('Please sign in first');
-                return;
-            }
+            var from = document.getElementById('contactFrom').value.trim();
             var subject = document.getElementById('contactSubject').value.trim();
             var body = document.getElementById('contactBody').value.trim();
             if (!subject && !body) {
                 showToast('Please enter a subject or message');
                 return;
             }
-
-            var btn = document.getElementById('btnSendEmail');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="sending-spinner"></span> Sending...';
-
-            // Build RFC 2822 email
-            var to = '078bce035.bibek@pcampus.edu.np';
-            var emailLines = [
-                'From: ' + gmailUser.name + ' <' + gmailUser.email + '>',
-                'To: ' + to,
-                'Subject: ' + (subject || 'Message from IOE Marks Predictor'),
-                'Content-Type: text/plain; charset=UTF-8',
-                '',
-                body
-            ];
-            var rawEmail = emailLines.join('\r\n');
-            // Base64url encode
-            var encoded = btoa(unescape(encodeURIComponent(rawEmail)))
-                .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
-            fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + gmailUser.accessToken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ raw: encoded })
-            })
-            .then(function(r) {
-                if (!r.ok) throw new Error('Gmail API error: ' + r.status);
-                return r.json();
-            })
-            .then(function() {
-                showToast('Message sent successfully!');
-                document.getElementById('contactSubject').value = '';
-                document.getElementById('contactBody').value = '';
-                btn.disabled = false;
-                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Sent!';
-                setTimeout(function() {
-                    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send';
-                }, 2500);
-            })
-            .catch(function(err) {
-                showToast('Failed to send. Please try again.');
-                btn.disabled = false;
-                btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send';
-            });
+            var fullBody = body;
+            if (from) fullBody += '\n\n— From: ' + from;
+            var mailto = 'mailto:078bce035.bibek@pcampus.edu.np'
+                + '?subject=' + encodeURIComponent(subject || 'Message from IOE Marks Predictor')
+                + '&body=' + encodeURIComponent(fullBody);
+            window.open(mailto, '_blank');
         }
 
         // Init
