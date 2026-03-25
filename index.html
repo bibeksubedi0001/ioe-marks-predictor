@@ -735,6 +735,7 @@
             'BCE': 'Civil Engineering',
             'BCT': 'Computer Engineering',
             'BEI': 'Electronics, Communication & Information Eng.',
+            'BEL': 'Electrical Engineering',
             'BIE': 'Industrial Engineering',
             'BME': 'Mechanical Engineering'
         };
@@ -742,7 +743,8 @@
         const SEM_LABELS = {
             'sem1': 'I / I', 'sem2': 'I / II',
             'sem3': 'II / I', 'sem4': 'II / II',
-            'sem5': 'III / I'
+            'sem5': 'III / I', 'sem6': 'III / II',
+            'sem7': 'IV / I', 'sem8': 'IV / II'
         };
 
         /* ============================================================
@@ -786,7 +788,7 @@
             // Theory row
             if (r.theory_load > 0) {
                 var asstFM, finalFM;
-                if (/engineering\s*workshop/i.test(r.name)) {
+                if (/workshop/i.test(r.name)) {
                     asstFM = 20; finalFM = 0;
                 } else if (r.credit >= 3) {
                     asstFM = 40; finalFM = 60;
@@ -813,7 +815,7 @@
                 // Chemistry practicals are 25 FM despite practical_load=3
                 if (/chemistry/i.test(r.name) && r.practical_load <= 3) prFM = 25;
                 // Engineering Workshop practical is 30 FM
-                if (/engineering\s*workshop/i.test(r.name)) prFM = 30;
+                if (/workshop/i.test(r.name)) prFM = 30;
                 rows.push({
                     code: r.code,
                     title: r.theory_load > 0 ? cleanName + ' (Practical)' : cleanName,
@@ -967,9 +969,7 @@
 
             var semSel = document.getElementById('semSelect');
             semSel.innerHTML = '';
-            var sems = Object.keys(allData[fac]).filter(function(s) {
-                return parseInt(s.replace('sem','')) <= 5;
-            }).sort(function(a, b) {
+            var sems = Object.keys(allData[fac]).sort(function(a, b) {
                 return parseInt(a.replace('sem','')) - parseInt(b.replace('sem',''));
             });
             sems.forEach(function(s) {
