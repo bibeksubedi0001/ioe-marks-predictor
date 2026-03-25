@@ -1286,7 +1286,8 @@
                 var fm = s.asstFM + (s.finalFM || 0);
                 var gr = getGrade((tv / fm) * 100);
                 if (gr.g === 'NG') hasNG = true;
-                gpSum += gr.gp;
+                var bonus = (tv === fm) ? 0.01 : 0;
+                gpSum += gr.gp + bonus;
                 count++;
             });
             if (count > 0) {
