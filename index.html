@@ -1395,6 +1395,21 @@
             var sym = document.getElementById('symbolNo').value.trim();
             document.getElementById('infoSymbol').textContent = sym || '_______________';
             try { if (sym) localStorage.setItem('ioe_student_symbol', sym); else localStorage.removeItem('ioe_student_symbol'); } catch(e) {}
+
+            // Auto-detect faculty from symbol number (e.g. PUL078BCE035 → BCE)
+            if (sym) {
+                var match = sym.match(/\d{2,3}(B[A-Z]{2})\d/i);
+                if (match) {
+                    var fac = match[1].toUpperCase();
+                    var sel = document.getElementById('facSelect');
+                    if (sel && allData && allData[fac]) {
+                        if (sel.value !== fac) {
+                            sel.value = fac;
+                            onFacultyChange();
+                        }
+                    }
+                }
+            }
         }
 
         function updateCampus() {
