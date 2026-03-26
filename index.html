@@ -135,11 +135,19 @@
             text-transform: uppercase; letter-spacing: 0.8px;
         }
         .control-group select {
-            padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
+            padding: 10px 36px 10px 14px; border-radius: 10px; border: 1px solid var(--border);
             font-size: 0.9rem; background: var(--input-bg); cursor: pointer;
             font-family: 'Times New Roman', Times, serif;
             transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
             width: 100%; color: var(--text);
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+        [data-theme="dark"] .control-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         }
         .control-group select:focus {
             border-color: #2563eb; outline: none;
@@ -550,13 +558,23 @@
             .page-wrap { padding: 12px 10px 30px; }
             .control-panel { padding: 18px 16px; border-radius: 12px; margin-bottom: 16px; }
             .how-to-use { margin-bottom: 16px; }
-            .control-grid { grid-template-columns: 1fr; gap: 14px; }
-            .control-group label { font-size: 0.72rem; }
-            .control-group select, .control-group input[type="text"] { padding: 10px 12px; font-size: 0.88rem; }
-            .control-name-row { flex-direction: column; gap: 14px; margin-top: 14px; padding-top: 14px; }
+            .control-grid { grid-template-columns: 1fr; gap: 12px; }
+            .control-group label { font-size: 0.7rem; margin-bottom: 2px; }
+            .control-group select {
+                padding: 12px 38px 12px 14px; font-size: 0.92rem;
+                border-radius: 12px;
+                min-height: 46px;
+                background-position: right 14px center;
+            }
+            .control-group input[type="text"] {
+                padding: 12px 14px; font-size: 0.92rem;
+                border-radius: 12px;
+                min-height: 46px;
+            }
+            .control-name-row { flex-direction: column; gap: 12px; margin-top: 14px; padding-top: 14px; }
             .control-name-row .control-group { width: 100%; }
             .mode-toggle { width: 100%; justify-content: center; }
-            .mode-toggle button { flex: 1; text-align: center; padding: 9px 14px; }
+            .mode-toggle button { flex: 1; text-align: center; padding: 11px 14px; font-size: 0.88rem; }
             .top-nav { padding: 12px 14px; }
             .top-nav .brand-icon { width: 24px; height: 24px; }
             .top-nav h1 { font-size: 0.88rem; }
