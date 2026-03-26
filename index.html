@@ -794,6 +794,8 @@
                     asstFM = 60; finalFM = 40;
                 } else if (r.code === 'ENSH 303') {
                     asstFM = 30; finalFM = 20;
+                } else if (r.code === 'ENEE 253') {
+                    asstFM = 20; finalFM = 30;
                 } else if (r.credit >= 3) {
                     asstFM = 40; finalFM = 60;
                 } else if (r.credit === 2) {
@@ -1149,7 +1151,7 @@
             currentSubjects.forEach(function(s, i) {
                 var tr = document.createElement('tr');
                 if (s.practical) tr.classList.add('practical');
-                var hasFinal = !s.practical && s.finalFM > 0;
+                var hasFinal = s.finalFM > 0;
                 var inputClass = mode === 'predict' ? 'inp-green' : 'inp-blue';
                 var asstTitle = mode === 'predict'
                     ? 'Marks given by teacher (out of ' + s.asstFM + ')'
@@ -1187,7 +1189,7 @@
             var totalEl = document.getElementById('total_' + i);
             var gradeEl = document.getElementById('grade_' + i);
             var remarkEl = document.getElementById('remark_' + i);
-            var hasFinal = !s.practical && s.finalFM > 0;
+            var hasFinal = s.finalFM > 0;
 
             var asstEl = document.getElementById('asst_' + i);
             var finalEl = document.getElementById('final_' + i);
@@ -1216,7 +1218,7 @@
             if (isNaN(asstVal) || asstVal < 0 || asstVal > s.asstFM) return;
 
             // Practical / no final
-            if (s.practical || !hasFinal) {
+            if (!hasFinal) {
                 var total = Math.round(asstVal);
                 var totalFM = s.asstFM;
                 var pct = (total / totalFM) * 100;
