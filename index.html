@@ -797,6 +797,10 @@
                 <label>Symbol No.</label>
                 <input type="text" id="symbolNo" placeholder="e.g. PUL078BCE035" oninput="updateSymbol()">
             </div>
+            <div class="control-group">
+                <label>Campus</label>
+                <select id="campusSelect" onchange="updateCampus()"></select>
+            </div>
         </div>
     </div>
 
@@ -835,7 +839,7 @@
             <div style="text-align:left;">Symbol No.: <b id="infoSymbol">_______________</b></div>
             <div>Level: <b>Bachelor in Engineering</b></div>
             <div style="text-align:left;">Programme: <b id="infoProgramme">Civil Engineering</b></div>
-            <div>Campus: <b>Pulchowk Campus</b></div>
+            <div>Campus: <b id="infoCampus">Pulchowk Campus</b></div>
             <div style="text-align:left;">Year/Part: <b id="infoYearPart">I/I</b></div>
         </div>
 
@@ -963,6 +967,27 @@
             'BIE': 'Industrial Engineering',
             'BME': 'Mechanical Engineering'
         };
+
+        const IOE_CAMPUSES = [
+            'Pulchowk Campus',
+            'Thapathali Campus',
+            'Paschimanchal Campus',
+            'Purwanchal Campus',
+            'Chitwan Engineering Campus',
+            'Advanced College of Engg. & Mgmt.',
+            'Himalaya College of Engineering',
+            'Kantipur Engineering College',
+            'Kathmandu Engineering College',
+            'Khwopa College of Engineering',
+            'Khwopa Engineering College',
+            'Lumbini Engineering College',
+            'Madhyanchal Campus',
+            'National College of Engineering',
+            'Nepal Engineering College',
+            'Sagarmatha Engineering College',
+            'Janakpur Engineering College',
+            'Pashchimanchal Engineering Campus'
+        ];
 
         const SEM_LABELS = {
             'sem1': 'I / I', 'sem2': 'I / II',
@@ -1100,6 +1125,7 @@
         function showUI(raw) {
             processData(raw);
             populateFacultySelect();
+            populateCampusSelect();
             onFacultyChange();
             var loader = document.getElementById('loader');
             loader.classList.add('fade-out');
@@ -1356,12 +1382,31 @@
             try { if (sym) localStorage.setItem('ioe_student_symbol', sym); else localStorage.removeItem('ioe_student_symbol'); } catch(e) {}
         }
 
+        function updateCampus() {
+            var campus = document.getElementById('campusSelect').value;
+            document.getElementById('infoCampus').textContent = campus;
+            try { localStorage.setItem('ioe_campus', campus); } catch(e) {}
+        }
+
+        function populateCampusSelect() {
+            var sel = document.getElementById('campusSelect');
+            sel.innerHTML = '';
+            IOE_CAMPUSES.forEach(function(c) {
+                var opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                sel.appendChild(opt);
+            });
+        }
+
         function restoreStudentInfo() {
             try {
                 var name = localStorage.getItem('ioe_student_name');
                 var sym = localStorage.getItem('ioe_student_symbol');
+                var campus = localStorage.getItem('ioe_campus');
                 if (name) { document.getElementById('studentName').value = name; document.getElementById('infoName').textContent = name; }
                 if (sym) { document.getElementById('symbolNo').value = sym; document.getElementById('infoSymbol').textContent = sym; }
+                if (campus) { document.getElementById('campusSelect').value = campus; document.getElementById('infoCampus').textContent = campus; }
             } catch(e) {}
         }
 
@@ -1673,11 +1718,13 @@
 
         function resetAll() {
             clearSavedMarks();
-            try { localStorage.removeItem('ioe_student_name'); localStorage.removeItem('ioe_student_symbol'); } catch(e) {}
+            try { localStorage.removeItem('ioe_student_name'); localStorage.removeItem('ioe_student_symbol'); localStorage.removeItem('ioe_campus'); } catch(e) {}
             document.getElementById('studentName').value = '';
             document.getElementById('symbolNo').value = '';
             document.getElementById('infoName').textContent = '___________________________';
             document.getElementById('infoSymbol').textContent = '_______________';
+            document.getElementById('campusSelect').selectedIndex = 0;
+            document.getElementById('infoCampus').textContent = IOE_CAMPUSES[0];
             loadSemester();
         }
 
