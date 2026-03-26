@@ -555,10 +555,10 @@
         .subject-modal-overlay {
             display: none;
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             justify-content: center; align-items: center;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(4px);
             animation: smOverlayIn 0.2s ease;
         }
         .subject-modal-overlay.active { display: flex; }
@@ -566,54 +566,162 @@
         .subject-modal {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            max-width: 520px; width: 92%;
+            border-radius: 16px;
+            max-width: 540px; width: 92%;
             max-height: 85vh; overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-            animation: smSlideIn 0.25s ease;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            animation: smSlideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
             padding: 0;
         }
-        @keyframes smSlideIn { from { transform: translateY(20px) scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
+        @keyframes smSlideIn { from { transform: translateY(30px) scale(0.95); opacity: 0; } to { transform: none; opacity: 1; } }
         .sm-header {
-            display: flex; align-items: flex-start; justify-content: space-between;
-            padding: 20px 24px 14px;
+            position: relative;
+            padding: 24px 24px 20px;
+            background:
+                radial-gradient(ellipse 80% 60% at 90% 10%, rgba(56,189,248,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 10% 90%, rgba(139,92,246,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(59,130,246,0.06) 0%, transparent 80%),
+                linear-gradient(160deg, #0b1a2e 0%, #0f2240 35%, #132d52 70%, #0e1f3a 100%);
+            border-radius: 16px 16px 0 0;
+            color: #fff;
+            display: flex; align-items: flex-start; gap: 14px;
+            overflow: hidden;
+        }
+        .sm-header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
+            pointer-events: none;
+        }
+        .sm-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle 1px at 15% 25%, rgba(255,255,255,0.25) 0%, transparent 1px),
+                radial-gradient(circle 1px at 75% 15%, rgba(255,255,255,0.2) 0%, transparent 1px),
+                radial-gradient(circle 1px at 45% 80%, rgba(255,255,255,0.15) 0%, transparent 1px),
+                radial-gradient(circle 1px at 85% 70%, rgba(255,255,255,0.2) 0%, transparent 1px),
+                radial-gradient(circle 1px at 30% 55%, rgba(255,255,255,0.12) 0%, transparent 1px),
+                radial-gradient(circle 1px at 60% 40%, rgba(255,255,255,0.18) 0%, transparent 1px);
+            pointer-events: none;
+        }
+        [data-theme="dark"] .sm-header {
+            background:
+                radial-gradient(ellipse 80% 60% at 90% 10%, rgba(56,189,248,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 10% 90%, rgba(139,92,246,0.07) 0%, transparent 50%),
+                linear-gradient(160deg, #050e1a 0%, #091728 35%, #0c1e38 70%, #07111f 100%);
+        }
+        .sm-header-logo {
+            width: 46px; height: 46px; border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 5px;
+            flex-shrink: 0; margin-top: 1px;
+            position: relative; z-index: 1;
+        }
+        .sm-header-logo img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)); }
+        .sm-header-text { flex: 1; min-width: 0; position: relative; z-index: 1; }
+        .sm-header h3 {
+            font-size: 1.12rem; color: #fff; margin: 0; line-height: 1.3;
+            font-weight: 700; letter-spacing: -0.01em;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .sm-header .sm-code {
+            display: inline-block;
+            font-size: 0.7rem; color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 3px 12px; border-radius: 20px;
+            margin-top: 8px; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .sm-close {
+            position: absolute; top: 16px; right: 16px; z-index: 2;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            cursor: pointer;
+            font-size: 1.15rem; color: rgba(255,255,255,0.7); width: 30px; height: 30px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s, color 0.15s;
+        }
+        .sm-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
+        .sm-body { padding: 20px 24px 24px; }
+        .sm-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            margin-bottom: 20px;
+        }
+        .sm-stat {
+            text-align: center;
+            background: var(--surface-alt); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px 8px 12px;
+        }
+        .sm-stat-icon { margin-bottom: 4px; display: flex; justify-content: center; }
+        .sm-stat-icon svg { width: 20px; height: 20px; color: var(--text-muted); }
+        .sm-stat-val { font-size: 1.2rem; font-weight: 800; color: var(--text); line-height: 1.2; }
+        .sm-stat-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 2px; }
+        .sm-section-title {
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.8px; color: var(--text-muted);
+            margin: 20px 0 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sm-section-title::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .sm-marks-table {
+            width: 100%; border-collapse: collapse; font-size: 0.82rem;
+            margin-bottom: 6px;
+        }
+        .sm-marks-table thead th {
+            text-align: left; padding: 8px 10px;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted);
+            border-bottom: 2px solid var(--border-strong);
+        }
+        .sm-marks-table tbody td {
+            padding: 8px 10px; color: var(--text);
             border-bottom: 1px solid var(--border);
         }
-        .sm-header h3 { font-size: 1.1rem; color: var(--text); margin: 0; line-height: 1.35; }
-        .sm-header .sm-code { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
-        .sm-close {
-            background: none; border: none; cursor: pointer;
-            font-size: 1.4rem; color: var(--text-muted); padding: 0 0 0 12px; line-height: 1;
-            transition: color 0.15s;
+        .sm-marks-table tbody tr:last-child td {
+            border-bottom: none;
         }
-        .sm-close:hover { color: var(--text); }
-        .sm-body { padding: 18px 24px 24px; }
-        .sm-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-            margin-bottom: 18px;
+        .sm-marks-table tfoot td {
+            padding: 8px 10px; font-weight: 800; color: var(--text);
+            border-top: 2px solid var(--border-strong);
         }
-        .sm-card {
+        .sm-dept-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;
+        }
+        .sm-dept-badge svg { width: 14px; height: 14px; opacity: 0.6; }
+        .sm-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .sm-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.72rem; font-weight: 600;
+            padding: 4px 12px; border-radius: 20px;
             background: var(--surface-alt); border: 1px solid var(--border);
-            border-radius: 8px; padding: 12px 14px;
+            color: var(--text);
         }
-        .sm-card-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
-        .sm-card-value { font-size: 1rem; font-weight: 700; color: var(--text); }
-        .sm-section-title {
-            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px; color: var(--text-muted);
-            margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
+        .sm-pill-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #3b82f6; flex-shrink: 0;
         }
-        .sm-marks-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .sm-marks-table th { text-align: left; padding: 6px 10px; color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
-        .sm-marks-table td { padding: 6px 10px; color: var(--text); border-top: 1px solid var(--border); }
-        .sm-marks-table tr:last-child td { font-weight: 700; border-top: 2px solid var(--border-strong); }
-        .sm-dept { font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; }
-        td.subj-link { cursor: pointer; }
+        .sm-pill-current .sm-pill-dot { background: #22c55e; }
+        .sm-pill-current { border-color: #22c55e; background: rgba(34,197,94,0.08); }
+        td.subj-link { cursor: pointer; transition: color 0.15s; }
         td.subj-link:hover { text-decoration: underline; color: #2563eb; }
         [data-theme="dark"] td.subj-link:hover { color: #60a5fa; }
         @media (max-width: 500px) {
-            .sm-grid { grid-template-columns: 1fr; }
-            .sm-header { padding: 16px 16px 12px; }
+            .sm-stats { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .sm-stat { padding: 10px 6px 8px; }
+            .sm-stat-val { font-size: 1rem; }
+            .sm-header { padding: 18px 16px 14px; gap: 10px; }
+            .sm-header-logo { width: 36px; height: 36px; }
             .sm-body { padding: 14px 16px 20px; }
         }
     </style>
@@ -809,7 +917,8 @@
     <div class="subject-modal-overlay" id="subjectModalOverlay" onclick="if(event.target===this)closeSubjectModal()">
         <div class="subject-modal">
             <div class="sm-header">
-                <div>
+                <div class="sm-header-logo"><img src="assets/logo.svg" alt="TU"></div>
+                <div class="sm-header-text">
                     <h3 id="smTitle"></h3>
                     <div class="sm-code" id="smCode"></div>
                 </div>
@@ -1294,51 +1403,87 @@
             document.getElementById('smTitle').textContent = cleanName;
             document.getElementById('smCode').textContent = raw.code;
 
-            // Find which rows this subject produces (for marks breakdown)
             var rows = deriveMarks({
                 code: raw.code, name: raw.name, credit: raw.credit,
                 theory_load: raw.theory_load, practical_load: raw.practical_load
             });
 
-            var html = '<div class="sm-grid">';
-            html += '<div class="sm-card"><div class="sm-card-label">Credit Hours</div><div class="sm-card-value">' + raw.credit + '</div></div>';
-            html += '<div class="sm-card"><div class="sm-card-label">Theory Load</div><div class="sm-card-value">' + (raw.theory_load > 0 ? raw.theory_load + ' hrs/week' : 'N/A') + '</div></div>';
-            html += '<div class="sm-card"><div class="sm-card-label">Practical Load</div><div class="sm-card-value">' + (raw.practical_load > 0 ? raw.practical_load + ' hrs/week' : 'N/A') + '</div></div>';
-            html += '<div class="sm-card"><div class="sm-card-label">Department</div><div class="sm-card-value">' + (raw.department_name || '\u2014') + '</div></div>';
+            // SVG icons for stats
+            var creditIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg>';
+            var theoryIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+            var practIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
+
+            var html = '<div class="sm-stats">';
+            html += '<div class="sm-stat"><div class="sm-stat-icon">' + creditIcon + '</div><div class="sm-stat-val">' + raw.credit + '</div><div class="sm-stat-lbl">Credits</div></div>';
+            html += '<div class="sm-stat"><div class="sm-stat-icon">' + theoryIcon + '</div><div class="sm-stat-val">' + (raw.theory_load > 0 ? raw.theory_load + 'h' : '\u2014') + '</div><div class="sm-stat-lbl">Theory/wk</div></div>';
+            html += '<div class="sm-stat"><div class="sm-stat-icon">' + practIcon + '</div><div class="sm-stat-val">' + (raw.practical_load > 0 ? raw.practical_load + 'h' : '\u2014') + '</div><div class="sm-stat-lbl">Practical/wk</div></div>';
             html += '</div>';
 
-            // Marks breakdown
+            // Department
+            if (raw.department_name) {
+                html += '<div class="sm-dept-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14m6-14v14m6-14v14m6-14v14M6 7h12M9 4h6l3 3H6l3-3z"/></svg> ' + raw.department_name + '</div>';
+            }
+
+            // Marks breakdown — clean table
             html += '<div class="sm-section-title">Marks Structure</div>';
-            html += '<table class="sm-marks-table"><tr><th>Component</th><th>Assessment</th><th>Final</th><th>Total FM</th><th>Pass</th></tr>';
-            var totalAsst = 0, totalFinal = 0;
+            html += '<table class="sm-marks-table"><thead><tr><th>Component</th><th>Assessment</th><th>Final</th><th>Total FM</th><th>Pass Marks</th></tr></thead><tbody>';
+            var grandAsst = 0, grandFinal = 0;
             rows.forEach(function(r) {
                 var label = r.practical ? 'Practical' : 'Theory';
-                if (rows.length === 1) label = r.practical ? 'Practical' : 'Theory';
                 var fm = r.asstFM + r.finalFM;
-                totalAsst += r.asstFM;
-                totalFinal += r.finalFM;
-                html += '<tr><td>' + label + '</td><td>' + r.asstFM + '</td><td>' + (r.finalFM || '\u2014') + '</td><td>' + fm + '</td><td>' + (r.passAsst + r.passFinal) + '</td></tr>';
+                grandAsst += r.asstFM;
+                grandFinal += r.finalFM;
+                html += '<tr><td>' + label + '</td><td>' + r.asstFM + '</td><td>' + (r.finalFM || '\u2014') + '</td><td>' + fm + '</td><td>' + (r.passAsst + (r.passFinal || 0)) + '</td></tr>';
             });
+            html += '</tbody>';
             if (rows.length > 1) {
-                html += '<tr><td>Total</td><td>' + totalAsst + '</td><td>' + totalFinal + '</td><td>' + (totalAsst + totalFinal) + '</td><td>\u2014</td></tr>';
+                html += '<tfoot><tr><td>Total</td><td>' + grandAsst + '</td><td>' + grandFinal + '</td><td>' + (grandAsst + grandFinal) + '</td><td>\u2014</td></tr></tfoot>';
             }
             html += '</table>';
 
-            // Taught in faculties
-            if (raw.academic_classes && raw.academic_classes.length > 0) {
-                var facSet = {};
+            // Taught in — scan allData + raw academic_classes for complete coverage
+            var currentFac = document.getElementById('facSelect').value;
+            var currentSem = document.getElementById('semSelect').value;
+            var taughtSet = {};
+            // From allData (processed subjects)
+            if (allData) {
+                for (var fac in allData) {
+                    for (var sem in allData[fac]) {
+                        var found = allData[fac][sem].some(function(s) { return s.code === code; });
+                        if (found) {
+                            var key = fac + '|' + sem;
+                            if (!taughtSet[key]) {
+                                var semNum = sem.replace('sem', '');
+                                var isCurrent = (fac === currentFac && sem === currentSem);
+                                taughtSet[key] = { label: fac + ' - Sem ' + semNum, current: isCurrent };
+                            }
+                        }
+                    }
+                }
+            }
+            // From raw academic_classes (catches semesters filtered out of allData)
+            if (raw.academic_classes) {
                 raw.academic_classes.forEach(function(ac) {
-                    if (ac.faculty.startsWith('B')) {
-                        var sem = ac.semester ? ac.semester.replace('sem','') : '?';
-                        var key = ac.faculty + ' (Sem ' + sem + ')';
-                        facSet[key] = true;
+                    if (ac.faculty && ac.faculty.startsWith('B') && ac.semester) {
+                        var key = ac.faculty + '|' + ac.semester;
+                        if (!taughtSet[key]) {
+                            var semNum = ac.semester.replace('sem', '');
+                            var isCurrent = (ac.faculty === currentFac && ac.semester === currentSem);
+                            taughtSet[key] = { label: ac.faculty + ' - Sem ' + semNum, current: isCurrent };
+                        }
                     }
                 });
-                var facList = Object.keys(facSet).sort();
-                if (facList.length > 0) {
-                    html += '<div class="sm-section-title">Taught In</div>';
-                    html += '<div class="sm-dept">' + facList.join(' &nbsp;&bull;&nbsp; ') + '</div>';
-                }
+            }
+            var taughtList = Object.keys(taughtSet).map(function(k) { return taughtSet[k]; });
+            taughtList.sort(function(a, b) { return a.label.localeCompare(b.label); });
+            if (taughtList.length > 0) {
+                html += '<div class="sm-section-title">Also Taught In</div>';
+                html += '<div class="sm-pills">';
+                taughtList.forEach(function(t) {
+                    var cls = t.current ? 'sm-pill sm-pill-current' : 'sm-pill';
+                    html += '<span class="' + cls + '"><span class="sm-pill-dot"></span>' + t.label + (t.current ? ' (current)' : '') + '</span>';
+                });
+                html += '</div>';
             }
 
             document.getElementById('smBody').innerHTML = html;
