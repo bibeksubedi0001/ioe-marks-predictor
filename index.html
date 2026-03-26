@@ -65,6 +65,21 @@
             padding: 0;
             color: var(--text);
             transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 708px;
+            background-image: url('assets/logo.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* ---- Top Nav Bar ---- */
@@ -535,6 +550,72 @@
             .btn { padding: 10px 16px; font-size: 0.82rem; }
             .btn-row { gap: 10px; margin-top: 20px; }
         }
+
+        /* ---- Subject Info Modal ---- */
+        .subject-modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+            animation: smOverlayIn 0.2s ease;
+        }
+        .subject-modal-overlay.active { display: flex; }
+        @keyframes smOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+        .subject-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 520px; width: 92%;
+            max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: smSlideIn 0.25s ease;
+            padding: 0;
+        }
+        @keyframes smSlideIn { from { transform: translateY(20px) scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
+        .sm-header {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            padding: 20px 24px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        .sm-header h3 { font-size: 1.1rem; color: var(--text); margin: 0; line-height: 1.35; }
+        .sm-header .sm-code { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+        .sm-close {
+            background: none; border: none; cursor: pointer;
+            font-size: 1.4rem; color: var(--text-muted); padding: 0 0 0 12px; line-height: 1;
+            transition: color 0.15s;
+        }
+        .sm-close:hover { color: var(--text); }
+        .sm-body { padding: 18px 24px 24px; }
+        .sm-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            margin-bottom: 18px;
+        }
+        .sm-card {
+            background: var(--surface-alt); border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px 14px;
+        }
+        .sm-card-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+        .sm-card-value { font-size: 1rem; font-weight: 700; color: var(--text); }
+        .sm-section-title {
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-muted);
+            margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
+        }
+        .sm-marks-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .sm-marks-table th { text-align: left; padding: 6px 10px; color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+        .sm-marks-table td { padding: 6px 10px; color: var(--text); border-top: 1px solid var(--border); }
+        .sm-marks-table tr:last-child td { font-weight: 700; border-top: 2px solid var(--border-strong); }
+        .sm-dept { font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; }
+        td.subj-link { cursor: pointer; }
+        td.subj-link:hover { text-decoration: underline; color: #2563eb; }
+        [data-theme="dark"] td.subj-link:hover { color: #60a5fa; }
+        @media (max-width: 500px) {
+            .sm-grid { grid-template-columns: 1fr; }
+            .sm-header { padding: 16px 16px 12px; }
+            .sm-body { padding: 14px 16px 20px; }
+        }
     </style>
 </head>
 <body>
@@ -603,6 +684,7 @@
                     <br>&bull; <strong>Reverse</strong> &mdash; Enter marks from your published grade sheet to reverse-calculate the teacher-given marks.
                 </li>
                 <li>Fill in the <strong>Obtained Marks</strong> columns. Results update instantly.</li>
+                <li>Click any <strong>Subject Code</strong> or <strong>Name</strong> to view its credit hours, marks structure, and other details.</li>
                 <li>Optionally enter your <strong>Name</strong> and <strong>Symbol No.</strong> for the header.</li>
                 <li>Use <strong>Print</strong> or <strong>Save as Image</strong> to export your grade sheet.</li>
             </ol>
@@ -723,6 +805,20 @@
 
     </div><!-- /page-wrap -->
 
+    <!-- Subject Info Modal -->
+    <div class="subject-modal-overlay" id="subjectModalOverlay" onclick="if(event.target===this)closeSubjectModal()">
+        <div class="subject-modal">
+            <div class="sm-header">
+                <div>
+                    <h3 id="smTitle"></h3>
+                    <div class="sm-code" id="smCode"></div>
+                </div>
+                <button class="sm-close" onclick="closeSubjectModal()" title="Close">&times;</button>
+            </div>
+            <div class="sm-body" id="smBody"></div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="data/subject-data.js?v=2"></script>
     <script>
@@ -751,6 +847,7 @@
            State
         ============================================================ */
         let allData = null;       // processed { faculty: { sem: [subjects] } }
+        let rawSubjectMap = {};   // code -> raw subject data from JSON
         let currentSubjects = [];
         let mode = 'predict';
 
@@ -897,7 +994,13 @@
 
         function processData(raw) {
             allData = {};
+            rawSubjectMap = {};
             var results = raw.results || [];
+
+            // Build raw subject lookup by code
+            results.forEach(function(r) {
+                rawSubjectMap[r.code] = r;
+            });
 
             // Group subjects by faculty -> semester, picking latest batch_year
             // facSemBatch[fac][sem] = { maxBatch, codes: Set }
@@ -1161,8 +1264,8 @@
                     : 'Marksheet Final marks (out of ' + s.finalFM + ')';
 
                 tr.innerHTML =
-                    '<td>' + s.code + '</td>' +
-                    '<td>' + s.title + '</td>' +
+                    '<td class="subj-link" onclick="showSubjectInfo(\'' + s.code.replace(/'/g, "\\'") + '\')">' + s.code + '</td>' +
+                    '<td class="subj-link" onclick="showSubjectInfo(\'' + s.code.replace(/'/g, "\\'") + '\')">' + s.title + '</td>' +
                     '<td>' + s.asstFM + '</td>' +
                     '<td>' + (s.finalFM || '\u2014') + '</td>' +
                     '<td>' + s.passAsst + '</td>' +
@@ -1179,6 +1282,71 @@
                 tbody.appendChild(tr);
             });
             clearFooter();
+        }
+
+        /* ============================================================
+           Subject Info Modal
+        ============================================================ */
+        function showSubjectInfo(code) {
+            var raw = rawSubjectMap[code];
+            if (!raw) return;
+            var cleanName = raw.name.replace(/\s*\[.*$/, '');
+            document.getElementById('smTitle').textContent = cleanName;
+            document.getElementById('smCode').textContent = raw.code;
+
+            // Find which rows this subject produces (for marks breakdown)
+            var rows = deriveMarks({
+                code: raw.code, name: raw.name, credit: raw.credit,
+                theory_load: raw.theory_load, practical_load: raw.practical_load
+            });
+
+            var html = '<div class="sm-grid">';
+            html += '<div class="sm-card"><div class="sm-card-label">Credit Hours</div><div class="sm-card-value">' + raw.credit + '</div></div>';
+            html += '<div class="sm-card"><div class="sm-card-label">Theory Load</div><div class="sm-card-value">' + (raw.theory_load > 0 ? raw.theory_load + ' hrs/week' : 'N/A') + '</div></div>';
+            html += '<div class="sm-card"><div class="sm-card-label">Practical Load</div><div class="sm-card-value">' + (raw.practical_load > 0 ? raw.practical_load + ' hrs/week' : 'N/A') + '</div></div>';
+            html += '<div class="sm-card"><div class="sm-card-label">Department</div><div class="sm-card-value">' + (raw.department_name || '\u2014') + '</div></div>';
+            html += '</div>';
+
+            // Marks breakdown
+            html += '<div class="sm-section-title">Marks Structure</div>';
+            html += '<table class="sm-marks-table"><tr><th>Component</th><th>Assessment</th><th>Final</th><th>Total FM</th><th>Pass</th></tr>';
+            var totalAsst = 0, totalFinal = 0;
+            rows.forEach(function(r) {
+                var label = r.practical ? 'Practical' : 'Theory';
+                if (rows.length === 1) label = r.practical ? 'Practical' : 'Theory';
+                var fm = r.asstFM + r.finalFM;
+                totalAsst += r.asstFM;
+                totalFinal += r.finalFM;
+                html += '<tr><td>' + label + '</td><td>' + r.asstFM + '</td><td>' + (r.finalFM || '\u2014') + '</td><td>' + fm + '</td><td>' + (r.passAsst + r.passFinal) + '</td></tr>';
+            });
+            if (rows.length > 1) {
+                html += '<tr><td>Total</td><td>' + totalAsst + '</td><td>' + totalFinal + '</td><td>' + (totalAsst + totalFinal) + '</td><td>\u2014</td></tr>';
+            }
+            html += '</table>';
+
+            // Taught in faculties
+            if (raw.academic_classes && raw.academic_classes.length > 0) {
+                var facSet = {};
+                raw.academic_classes.forEach(function(ac) {
+                    if (ac.faculty.startsWith('B')) {
+                        var sem = ac.semester ? ac.semester.replace('sem','') : '?';
+                        var key = ac.faculty + ' (Sem ' + sem + ')';
+                        facSet[key] = true;
+                    }
+                });
+                var facList = Object.keys(facSet).sort();
+                if (facList.length > 0) {
+                    html += '<div class="sm-section-title">Taught In</div>';
+                    html += '<div class="sm-dept">' + facList.join(' &nbsp;&bull;&nbsp; ') + '</div>';
+                }
+            }
+
+            document.getElementById('smBody').innerHTML = html;
+            document.getElementById('subjectModalOverlay').classList.add('active');
+        }
+
+        function closeSubjectModal() {
+            document.getElementById('subjectModalOverlay').classList.remove('active');
         }
 
         /* ============================================================
@@ -1728,6 +1896,9 @@
 
         // Init
         init();
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeSubjectModal();
+        });
     </script>
 </body>
 </html>
