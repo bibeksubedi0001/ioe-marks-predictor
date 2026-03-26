@@ -344,10 +344,29 @@
             border-top: 1px solid var(--border); font-size: 0.85rem;
             flex-wrap: wrap; gap: 10px;
         }
+        .ms-footer .left, .ms-footer .right { flex: 1; min-width: 200px; }
         .ms-footer .left div, .ms-footer .right div { margin: 3px 0; }
         .ms-footer .right { text-align: right; }
         .ms-footer b { font-weight: bold; }
         [data-theme="dark"] .ms-footer .right div:nth-child(3) { color: var(--text-faint); }
+        @media (max-width: 700px) {
+            .ms-footer {
+                flex-direction: row; padding: 12px 14px; gap: 6px 14px;
+            }
+            .ms-footer .left, .ms-footer .right {
+                flex: 1; min-width: 0;
+            }
+            .ms-footer .left div, .ms-footer .right div { margin: 2px 0; font-size: 0.78rem; }
+        }
+        @media (max-width: 480px) {
+            .ms-footer {
+                display: grid; grid-template-columns: 1fr 1fr;
+                padding: 10px 12px; gap: 0 12px;
+            }
+            .ms-footer .left, .ms-footer .right { min-width: 0; }
+            .ms-footer .right { text-align: right; }
+            .ms-footer .left div, .ms-footer .right div { margin: 2px 0; font-size: 0.72rem; }
+        }
         .ms-bottom {
             display: flex; justify-content: space-between;
             padding: 6px 20px 12px; font-size: 0.78rem; color: var(--ms-text);
