@@ -879,6 +879,7 @@
             setTimeout(function() { loader.style.display = 'none'; }, 420);
             ['topNav','controlsBar','howToUse','marksheet','btnRow','contactSection','pageFooter']
                 .forEach(function(id) { document.getElementById(id).style.display = ''; });
+            restoreStudentInfo();
         }
 
         function init() {
@@ -1113,11 +1114,22 @@
         function updateName() {
             var name = document.getElementById('studentName').value.trim();
             document.getElementById('infoName').textContent = name || '___________________________';
+            try { if (name) localStorage.setItem('ioe_student_name', name); else localStorage.removeItem('ioe_student_name'); } catch(e) {}
         }
 
         function updateSymbol() {
             var sym = document.getElementById('symbolNo').value.trim();
             document.getElementById('infoSymbol').textContent = sym || '_______________';
+            try { if (sym) localStorage.setItem('ioe_student_symbol', sym); else localStorage.removeItem('ioe_student_symbol'); } catch(e) {}
+        }
+
+        function restoreStudentInfo() {
+            try {
+                var name = localStorage.getItem('ioe_student_name');
+                var sym = localStorage.getItem('ioe_student_symbol');
+                if (name) { document.getElementById('studentName').value = name; document.getElementById('infoName').textContent = name; }
+                if (sym) { document.getElementById('symbolNo').value = sym; document.getElementById('infoSymbol').textContent = sym; }
+            } catch(e) {}
         }
 
         function clearFooter() {
@@ -1327,6 +1339,11 @@
 
         function resetAll() {
             clearSavedMarks();
+            try { localStorage.removeItem('ioe_student_name'); localStorage.removeItem('ioe_student_symbol'); } catch(e) {}
+            document.getElementById('studentName').value = '';
+            document.getElementById('symbolNo').value = '';
+            document.getElementById('infoName').textContent = '___________________________';
+            document.getElementById('infoSymbol').textContent = '_______________';
             loadSemester();
         }
 
