@@ -1712,7 +1712,7 @@
                 count++;
             });
             if (count > 0) {
-                var gpa = gpSum / count;
+                var gpa = Math.min(gpSum / count, 4.0);
                 var gpaText = gpa.toFixed(2);
                 var gradeText = getOverallGrade(gpa);
                 var resultText = hasNG ? 'Fail' : 'Pass';
