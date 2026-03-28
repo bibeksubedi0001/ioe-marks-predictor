@@ -1054,11 +1054,11 @@
             if (r.theory_load > 0) {
                 var asstFM, finalFM;
                 if (/workshop/i.test(r.name)) {
-                    asstFM = 20; finalFM = 0;
+                    asstFM = 60; finalFM = 40;
                 } else if (r.code === 'ENME 152') {
                     asstFM = 60; finalFM = 40;
                 } else if (r.code === 'ENSH 303') {
-                    asstFM = 30; finalFM = 20;
+                    asstFM = 20; finalFM = 30;
                 } else if (r.code === 'ENEE 253') {
                     asstFM = 20; finalFM = 30;
                 } else if (r.credit >= 3) {
@@ -1086,8 +1086,8 @@
                 var prFinalFM = 0;
                 // Chemistry practicals are 25 FM despite practical_load=3
                 if (/chemistry/i.test(r.name) && r.practical_load <= 3) prFM = 25;
-                // Engineering Workshop practical is 30 FM
-                if (/workshop/i.test(r.name)) prFM = 30;
+                // Engineering Workshop practical is 50 FM
+                if (/workshop/i.test(r.name)) prFM = 50;
                 // Electrical Installation Workshop: 30 asst + 20 final
                 if (r.code === 'ENEE 152') { prFM = 30; prFinalFM = 20; }
                 rows.push({
