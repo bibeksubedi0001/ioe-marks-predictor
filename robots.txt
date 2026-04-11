@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ioe.bibeksubedi0001.com.np/sitemap.xml
