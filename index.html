@@ -16,7 +16,8 @@
     <meta name="twitter:description" content="Predict your IOE internal assessment marks or reverse-calculate teacher-given marks from your published grade sheet.">
     <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        input, textarea, select { -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; }
         html { scroll-behavior: smooth; }
         :root {
             --bg: #f8fafc;
@@ -2139,6 +2140,23 @@
         init();
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeSubjectModal();
+        });
+
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Block DevTools and view-source shortcuts
+        document.addEventListener('keydown', function(e) {
+            // F12
+            if (e.key === 'F12') { e.preventDefault(); return; }
+            // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) { e.preventDefault(); return; }
+            // Ctrl+U (view source)
+            if (e.ctrlKey && e.key.toUpperCase() === 'U') { e.preventDefault(); return; }
+            // Ctrl+S (save page)
+            if (e.ctrlKey && e.key.toUpperCase() === 'S') { e.preventDefault(); return; }
         });
     </script>
 </body>
