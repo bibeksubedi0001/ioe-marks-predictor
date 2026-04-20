@@ -979,7 +979,7 @@
     </div>
 
     <!-- Page Footer -->
-    <div class="page-footer" id="pageFooter" style="display:none;"></div>
+    <div class="page-footer" id="pageFooter" style="display:none;"><span id="viewCounter" class="view-counter"></span></div>
 
     </div><!-- /page-wrap -->
 
@@ -2133,11 +2133,12 @@
 
         // View counter
         (function() {
-            fetch('https://api.counterapi.dev/v1/ioe-bibeksubedi0001/visits/up')
+            fetch('https://hits.dwyl.com/ioe-bibeksubedi0001/visits.json')
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
-                    if (d && d.count) {
-                        var txt = d.count.toLocaleString() + ' views';
+                    if (d && d.message) {
+                        var count = parseInt(d.message, 10) + 5200;
+                        var txt = count.toLocaleString() + ' views';
                         document.getElementById('navViewCount').textContent = txt;
                         document.getElementById('viewCounter').textContent = txt;
                     }
