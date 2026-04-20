@@ -2133,17 +2133,26 @@
 
         // View counter
         (function() {
-            fetch('https://hits.dwyl.com/ioe-bibeksubedi0001/visits.json')
+            var counterBase = 5200;
+            // Register hit via hidden image (no CORS needed)
+            var img = new Image();
+            img.src = 'https://hits.dwyl.com/ioe-bibeksubedi0001/visits.svg?' + Date.now();
+            // Fetch count via CORS proxy for text display
+            fetch('https://api.codetabs.com/v1/proxy/?quest=https://hits.dwyl.com/ioe-bibeksubedi0001/visits.json')
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
                     if (d && d.message) {
-                        var count = parseInt(d.message, 10) + 5200;
+                        var count = parseInt(d.message, 10) + counterBase;
                         var txt = count.toLocaleString() + ' views';
                         document.getElementById('navViewCount').textContent = txt;
                         document.getElementById('viewCounter').textContent = txt;
                     }
                 })
-                .catch(function() {});
+                .catch(function() {
+                    var txt = counterBase.toLocaleString() + '+ views';
+                    document.getElementById('navViewCount').textContent = txt;
+                    document.getElementById('viewCounter').textContent = txt;
+                });
         })();
 
         /* ============================================================
