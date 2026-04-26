@@ -2138,10 +2138,7 @@
                 document.getElementById('navViewCount').textContent = txt;
                 document.getElementById('viewCounter').textContent = txt;
             }
-            // Register hit via hidden image (no CORS needed)
-            var img = new Image();
-            img.src = 'https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np&t=' + Date.now();
-            // Fetch count via CORS proxy
+            // Fetch count via CORS proxy (the proxy request itself registers the hit)
             fetch('https://api.codetabs.com/v1/proxy/?quest=https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np')
                 .then(function(r) { return r.text(); })
                 .then(function(svg) {
