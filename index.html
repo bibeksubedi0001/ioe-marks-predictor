@@ -2138,13 +2138,17 @@
                 document.getElementById('navViewCount').textContent = txt;
                 document.getElementById('viewCounter').textContent = txt;
             }
-            fetch('https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np')
+            // Register hit via hidden image (no CORS needed)
+            var img = new Image();
+            img.src = 'https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np&t=' + Date.now();
+            // Fetch count via CORS proxy
+            fetch('https://api.codetabs.com/v1/proxy/?quest=https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np')
                 .then(function(r) { return r.text(); })
                 .then(function(svg) {
-                    // Extract count from the SVG badge text
-                    var matches = svg.match(/<text[^>]*>(\d+)<\/text>/g);
-                    if (matches && matches.length >= 2) {
-                        var num = parseInt(matches[matches.length - 1].replace(/<\/?text[^>]*>/g, ''), 10);
+                    var m = svg.match(/<text[^>]*>(\d+)<\/text>/g);
+                    if (m) {
+                        var last = m[m.length - 1].replace(/<\/?text[^>]*>/g, '');
+                        var num = parseInt(last, 10);
                         if (!isNaN(num)) {
                             setViews((num + counterBase).toLocaleString() + ' views');
                             return;
@@ -2153,7 +2157,24 @@
                     throw new Error('parse failed');
                 })
                 .catch(function() {
-                    setViews(counterBase.toLocaleString() + '+ views');
+                    // Fallback: try allorigins proxy
+                    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np'))
+                        .then(function(r) { return r.text(); })
+                        .then(function(svg) {
+                            var m = svg.match(/<text[^>]*>(\d+)<\/text>/g);
+                            if (m) {
+                                var last = m[m.length - 1].replace(/<\/?text[^>]*>/g, '');
+                                var num = parseInt(last, 10);
+                                if (!isNaN(num)) {
+                                    setViews((num + counterBase).toLocaleString() + ' views');
+                                    return;
+                                }
+                            }
+                            throw new Error('parse failed');
+                        })
+                        .catch(function() {
+                            setViews(counterBase.toLocaleString() + '+ views');
+                        });
                 });
         })();
 
