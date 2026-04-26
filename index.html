@@ -2131,18 +2131,14 @@
         document.getElementById('footerDate').textContent = new Date()
             .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
 
-        // View counter
+        // View counter (CounterAPI.dev — free, instant, CORS-enabled)
         (function() {
             var counterBase = 5200;
-            // Register hit via hidden image (no CORS needed)
-            var img = new Image();
-            img.src = 'https://hits.dwyl.com/ioe-bibeksubedi0001/visits.svg?' + Date.now();
-            // Fetch count via CORS proxy for text display
-            fetch('https://api.codetabs.com/v1/proxy/?quest=https://hits.dwyl.com/ioe-bibeksubedi0001/visits.json')
+            fetch('https://cdn.counterapi.dev/hit/ioe.bibeksubedi0001.com.np/visits')
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
-                    if (d && d.message) {
-                        var count = parseInt(d.message, 10) + counterBase;
+                    if (d && typeof d.count === 'number') {
+                        var count = d.count + counterBase;
                         var txt = count.toLocaleString() + ' views';
                         document.getElementById('navViewCount').textContent = txt;
                         document.getElementById('viewCounter').textContent = txt;
