@@ -2131,23 +2131,29 @@
         document.getElementById('footerDate').textContent = new Date()
             .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
 
-        // View counter (CounterAPI.dev — free, instant, CORS-enabled)
+        // View counter — 7000 views before using this API
         (function() {
-            var counterBase = 5200;
-            fetch('https://cdn.counterapi.dev/hit/ioe.bibeksubedi0001.com.np/visits')
-                .then(function(r) { return r.json(); })
-                .then(function(d) {
-                    if (d && typeof d.count === 'number') {
-                        var count = d.count + counterBase;
-                        var txt = count.toLocaleString() + ' views';
-                        document.getElementById('navViewCount').textContent = txt;
-                        document.getElementById('viewCounter').textContent = txt;
+            var counterBase = 7000;
+            function setViews(txt) {
+                document.getElementById('navViewCount').textContent = txt;
+                document.getElementById('viewCounter').textContent = txt;
+            }
+            fetch('https://visitor-badge.laobi.icu/badge?page_id=ioe.bibeksubedi0001.com.np')
+                .then(function(r) { return r.text(); })
+                .then(function(svg) {
+                    // Extract count from the SVG badge text
+                    var matches = svg.match(/<text[^>]*>(\d+)<\/text>/g);
+                    if (matches && matches.length >= 2) {
+                        var num = parseInt(matches[matches.length - 1].replace(/<\/?text[^>]*>/g, ''), 10);
+                        if (!isNaN(num)) {
+                            setViews((num + counterBase).toLocaleString() + ' views');
+                            return;
+                        }
                     }
+                    throw new Error('parse failed');
                 })
                 .catch(function() {
-                    var txt = counterBase.toLocaleString() + '+ views';
-                    document.getElementById('navViewCount').textContent = txt;
-                    document.getElementById('viewCounter').textContent = txt;
+                    setViews(counterBase.toLocaleString() + '+ views');
                 });
         })();
 
