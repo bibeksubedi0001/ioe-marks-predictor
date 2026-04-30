@@ -1280,9 +1280,7 @@
 
             var semSel = document.getElementById('semSelect');
             semSel.innerHTML = '';
-            var sems = Object.keys(allData[fac]).filter(function(s) {
-                return parseInt(s.replace('sem','')) <= 5;
-            }).sort(function(a, b) {
+            var sems = Object.keys(allData[fac]).sort(function(a, b) {
                 return parseInt(a.replace('sem','')) - parseInt(b.replace('sem',''));
             });
             sems.forEach(function(s) {
