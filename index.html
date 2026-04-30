@@ -1256,6 +1256,36 @@
                     }
                 });
             }
+
+            // Override BCE semesters 6-8 with correct new curriculum
+            if (!allData['BCE']) allData['BCE'] = {};
+            allData['BCE']['sem6'] = [
+                { code: 'ENCE 351', title: 'Estimating and Costing', credit: 3, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 352', title: 'Design of RCC Structures', credit: 4, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 352', title: 'Design of RCC Structures (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true },
+                { code: 'ENCE 353', title: 'Transportation Engineering II', credit: 3, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 353', title: 'Transportation Engineering II (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true },
+                { code: 'ENCE 354', title: 'Irrigation and Drainage Engineering', credit: 4, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 355', title: 'Professional and Social Engineering', credit: 3, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 365-389', title: 'Elective I', credit: 3, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 365-389', title: 'Elective I (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true }
+            ];
+            allData['BCE']['sem7'] = [
+                { code: 'ENCE 401', title: 'Operations Research', credit: 2, asstFM: 20, finalFM: 30, passAsst: 8, passFinal: 12, practical: false },
+                { code: 'ENCE 401', title: 'Operations Research (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true },
+                { code: 'ENCE 402', title: 'Project and Construction Engineering', credit: 4, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 403', title: 'Hydropower Engineering', credit: 4, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 403', title: 'Hydropower Engineering (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true },
+                { code: 'ENCE 411-434', title: 'Elective II', credit: 3, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 411-434', title: 'Elective II (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true },
+                { code: 'ENCE 435-449', title: 'Elective III', credit: 3, asstFM: 40, finalFM: 60, passAsst: 16, passFinal: 24, practical: false },
+                { code: 'ENCE 435-449', title: 'Elective III (Practical)', credit: 0, asstFM: 25, finalFM: 0, passAsst: 10, passFinal: 0, practical: true },
+                { code: 'ENCE 404', title: 'Project I', credit: 2, asstFM: 50, finalFM: 0, passAsst: 20, passFinal: 0, practical: true }
+            ];
+            allData['BCE']['sem8'] = [
+                { code: 'ENCE 461', title: 'Project II', credit: 4, asstFM: 100, finalFM: 50, passAsst: 40, passFinal: 20, practical: true },
+                { code: 'ENCE 462', title: 'Internship', credit: 6, asstFM: 100, finalFM: 100, passAsst: 40, passFinal: 40, practical: true }
+            ];
         }
 
         /* ============================================================
